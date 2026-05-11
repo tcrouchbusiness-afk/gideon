@@ -2236,25 +2236,54 @@ async function init() {
       drawSlider();
     }, { passive: true });
 
-    // Swipe-to-rotate directly on the globe canvas (mobile touch only)
+    // Single-finger swipe-to-rotate + two-finger pinch-to-zoom (mobile only)
+    const ZOOM_MIN = 4.0, ZOOM_MAX = 14.0;
     let _touchStartX = 0, _touchLastX = 0, _touchRotating = false;
+    let _pinchDist0 = 0, _pinching = false;
+
+    function _pinchDist(touches) {
+      const dx = touches[1].clientX - touches[0].clientX;
+      const dy = touches[1].clientY - touches[0].clientY;
+      return Math.sqrt(dx * dx + dy * dy);
+    }
+
     canvas.addEventListener('touchstart', e => {
-      _touchStartX = e.touches[0].clientX;
-      _touchLastX  = _touchStartX;
-      _touchRotating = false;
+      if (e.touches.length === 2) {
+        _pinching = true;
+        _touchRotating = false;
+        _pinchDist0 = _pinchDist(e.touches);
+      } else {
+        _pinching = false;
+        _touchStartX = e.touches[0].clientX;
+        _touchLastX  = _touchStartX;
+        _touchRotating = false;
+      }
     }, { passive: true });
+
     canvas.addEventListener('touchmove', e => {
-      const x = e.touches[0].clientX;
-      const dx = x - _touchLastX;
-      if (!_touchRotating && Math.abs(x - _touchStartX) > 8) {
-        _touchRotating = true;
-        autoRotate = false;
-        autoBtn.classList.remove('active');
+      if (e.touches.length === 2 && _pinching) {
+        const dist = _pinchDist(e.touches);
+        const newZ = camera.position.z * (_pinchDist0 / dist);
+        camera.position.z = Math.min(ZOOM_MAX, Math.max(ZOOM_MIN, newZ));
+        _pinchDist0 = dist;
+      } else if (e.touches.length === 1 && !_pinching) {
+        const x = e.touches[0].clientX;
+        const dx = x - _touchLastX;
+        if (!_touchRotating && Math.abs(x - _touchStartX) > 8) {
+          _touchRotating = true;
+          autoRotate = false;
+          autoBtn.classList.remove('active');
+        }
+        if (_touchRotating) {
+          rotY += dx * 0.007;
+          _touchLastX = x;
+        }
       }
-      if (_touchRotating) {
-        rotY += dx * 0.007;
-        _touchLastX = x;
-      }
+    }, { passive: true });
+
+    canvas.addEventListener('touchend', e => {
+      if (e.touches.length < 2) _pinching = false;
+      if (e.touches.length === 0) _touchRotating = false;
     }, { passive: true });
 
     drawSlider();
