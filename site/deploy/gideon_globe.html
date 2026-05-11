@@ -2228,6 +2228,35 @@ async function init() {
     window.addEventListener('mouseup', () => { isDragging = false; });
     window.addEventListener('touchend', () => { isDragging = false; });
 
+    // Fix: slider touchmove was missing — finger drag now updates rotY on mobile
+    window.addEventListener('touchmove', e => {
+      if (!isDragging) return;
+      sliderVal = sliderPosToVal(e.touches[0].clientX);
+      rotY = (sliderVal / 628) * Math.PI * 2;
+      drawSlider();
+    }, { passive: true });
+
+    // Swipe-to-rotate directly on the globe canvas (mobile touch only)
+    let _touchStartX = 0, _touchLastX = 0, _touchRotating = false;
+    canvas.addEventListener('touchstart', e => {
+      _touchStartX = e.touches[0].clientX;
+      _touchLastX  = _touchStartX;
+      _touchRotating = false;
+    }, { passive: true });
+    canvas.addEventListener('touchmove', e => {
+      const x = e.touches[0].clientX;
+      const dx = x - _touchLastX;
+      if (!_touchRotating && Math.abs(x - _touchStartX) > 8) {
+        _touchRotating = true;
+        autoRotate = false;
+        autoBtn.classList.remove('active');
+      }
+      if (_touchRotating) {
+        rotY += dx * 0.007;
+        _touchLastX = x;
+      }
+    }, { passive: true });
+
     drawSlider();
 
     // Wire toggle buttons via JS — guaranteed to work
