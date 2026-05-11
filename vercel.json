@@ -1,0 +1,6 @@
+{
+  "outputDirectory": "site/deploy",
+  "buildCommand": "",
+  "cleanUrls": true,
+  "trailingSlash": false
+}

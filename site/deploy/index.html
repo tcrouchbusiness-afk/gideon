@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Gideon Dynamics</title>
+  <meta name="description" content="A discreet engineering firm. Defensive cyber capabilities for allied governments." />
+
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Gideon Dynamics" />
+  <meta property="og:description" content="A discreet engineering firm. Defensive cyber capabilities for allied governments." />
+  <meta property="og:site_name" content="Gideon Dynamics" />
+  <meta property="og:image" content="og-card.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="Gideon Dynamics — Defensive cyber capabilities" />
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Gideon Dynamics" />
+  <meta name="twitter:description" content="A discreet engineering firm. Defensive cyber capabilities for allied governments." />
+  <meta name="twitter:image" content="og-card.png" />
+  <meta name="twitter:image:alt" content="Gideon Dynamics — Defensive cyber capabilities" />
+
+  <!-- Discourage automated indexing of detailed content -->
+  <meta name="robots" content="index, nofollow, noarchive, nosnippet" />
+
+  <!-- Favicons / app icons -->
+  <link rel="icon" type="image/svg+xml" href="logo.svg" />
+  <link rel="icon" type="image/png" sizes="64x64" href="favicon.png" />
+  <link rel="apple-touch-icon" sizes="512x512" href="apple-touch-icon.png" />
+  <link rel="mask-icon" href="logo.svg" color="#9aa884" />
+  <meta name="theme-color" content="#0E1010" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+
+  <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+</head>
+<body>
+  <template id="__bundler_thumbnail">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="400 520 1200 960">
+      <defs>
+        <clipPath id="bt_cut"><rect x="0" y="0" width="2000" height="1480"/></clipPath>
+      </defs>
+      <polygon points="1000,520 1600,1120 1000,1720 400,1120" fill="#9aa884" clip-path="url(#bt_cut)"/>
+      <polygon points="1187.5,707.5 1600,1120 1187.5,1532.5 775,1120" fill="#080f08" clip-path="url(#bt_cut)"/>
+      <polygon points="1187.5,1042 1277.5,1198 1097.5,1198" fill="#9aa884" clip-path="url(#bt_cut)"/>
+      <polyline points="1000,520 1600,1120 1240,1480" fill="none" stroke="#9aa884" stroke-width="9" clip-path="url(#bt_cut)"/>
+      <line x1="520" y1="1480" x2="1480" y2="1480" stroke="#9aa884" stroke-width="7.5"/>
+    </svg>
+  </template>
+  <div id="root"></div>
+
+  <!-- Component scripts (order matters: shared/leaf modules first) -->
+  <script type="text/babel" src="tweaks-panel.jsx"></script>
+  <script type="text/babel" src="data.jsx"></script>
+  <script type="text/babel" src="live-feed.jsx"></script>
+  <script type="text/babel" src="hero-canvas.jsx"></script>
+  <script type="text/babel" src="world-outlines.jsx"></script>
+  <script type="text/babel" src="globe.jsx"></script>
+  <script type="text/babel" src="globe-tile.jsx"></script>
+  <script type="text/babel" src="nav.jsx"></script>
+  <script type="text/babel" src="hero.jsx"></script>
+  <script type="text/babel" src="page-home.jsx"></script>
+  <script type="text/babel" src="page-other.jsx"></script>
+
+  <script type="text/babel">
+    const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
+      "heroVariant": "default",
+      "heroSub": "Gideon Dynamics is an operating partner, not a vendor. Cleared engineers inside your enclave. Sovereign systems on hardware you trust. Authority that stays with you. We deploy on contract. We stay on station. The mission is yours, accountability is ours.",
+      "showClassification": true,
+      "showTicker": true
+    }/*EDITMODE-END*/;
+
+    const Footer = ({ setRoute }) => (
+      <footer className="footer">
+        <div className="footer-grid">
+          <div className="footer-col">
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
+              <Glyph size={22} />
+              <span className="mono" style={{ fontSize: 14, letterSpacing: '0.18em', fontWeight: 600 }}>GIDEON DYNAMICS</span>
+            </div>
+            <p className="footer-tag">Operators forward. Sovereign by design. Gideon Dynamics provides the cleared people and the operational capability to execute the mission — not licenses, not subscriptions, not partner-stack repackaging.</p>
+          </div>
+          <div className="footer-col">
+            <h5>Programs</h5>
+            <ul>
+              <li><a onClick={() => setRoute('platform')}>AXEHEAD</a></li>
+              <li><a onClick={() => setRoute('platform')}>CARTOGRAPHER</a></li>
+              <li><a onClick={() => setRoute('platform')}>REDOUBT</a></li>
+            </ul>
+          </div>
+          <div className="footer-col">
+            <h5>Company</h5>
+            <ul>
+              <li><a onClick={() => setRoute('mission')}>Mission</a></li>
+              <li><a onClick={() => setRoute('mission')}>Leadership</a></li>
+              <li><a onClick={() => setRoute('contact')}>Careers</a></li>
+              <li><a onClick={() => setRoute('contact')}>Press</a></li>
+            </ul>
+          </div>
+          <div className="footer-col">
+            <h5>Engage</h5>
+            <ul>
+              <li><a onClick={() => setRoute('contact')}>Request briefing</a></li>
+              <li><a onClick={() => setRoute('contact')}>Procurement</a></li>
+              <li><a onClick={() => setRoute('contact')}>On-site visit</a></li>
+            </ul>
+          </div>
+        </div>
+        <div className="footer-bottom">
+          <span>© 2026 GIDEON DYNAMICS, INC. · ST. PETERSBURG, FL</span>
+          <span>SAM UEI: GDN94X2KQ7L8 · NAICS 541512 / 541519</span>
+          <span>UNCLASSIFIED // FOR PUBLIC RELEASE</span>
+        </div>
+      </footer>
+    );
+
+    function App() {
+      const [t, setTweak] = useTweaks(TWEAK_DEFAULTS);
+      const [route, setRoute] = React.useState('home');
+
+      // hash routing
+      React.useEffect(() => {
+        const apply = () => {
+          const h = (window.location.hash || '#home').replace('#', '');
+          if (['home','platform','capabilities','mission','contact'].includes(h)) {
+            setRoute(h);
+          }
+        };
+        apply();
+        window.addEventListener('hashchange', apply);
+        return () => window.removeEventListener('hashchange', apply);
+      }, []);
+
+      const go = (r) => {
+        setRoute(r);
+        window.location.hash = r;
+        window.scrollTo(0, 0);
+      };
+
+      let page = null;
+      if (route === 'home')         page = <HomePage heroVariant={t.heroVariant} sub={t.heroSub} setRoute={go} />;
+      else if (route === 'platform')     page = <PlatformPage />;
+      else if (route === 'capabilities') page = <CapabilitiesPage />;
+      else if (route === 'mission')      page = <MissionPage />;
+      else if (route === 'contact')      page = <ContactPage />;
+
+      return (
+        <>
+          {t.showClassification && <Classification />}
+          <Nav route={route} setRoute={go} />
+          <main key={route}>{page}</main>
+          <Footer setRoute={go} />
+
+          <TweaksPanel title="Tweaks">
+            <TweakSection label="Hero" />
+            <TweakRadio
+              label="Variant"
+              value={t.heroVariant}
+              options={[
+                { value: 'default',  label: 'Mesh' },
+                { value: 'split',    label: 'Split' },
+                { value: 'terminal', label: 'Term' },
+              ]}
+              onChange={(v) => setTweak('heroVariant', v)}
+            />
+            <TweakText
+              label="Subhead"
+              value={t.heroSub}
+              onChange={(v) => setTweak('heroSub', v)}
+            />
+            <TweakSection label="Chrome" />
+            <TweakToggle
+              label="Classification bar"
+              value={t.showClassification}
+              onChange={(v) => setTweak('showClassification', v)}
+            />
+          </TweaksPanel>
+        </>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+  </script>
+</body>
+</html>

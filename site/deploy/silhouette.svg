@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 220" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+  <defs>
+    
+    <linearGradient id="silHi" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#1d1d1d"></stop>
+      <stop offset="55%" stop-color="#0e0e0e"></stop>
+      <stop offset="100%" stop-color="#000"></stop>
+    </linearGradient>
+    
+    <linearGradient id="silEdge" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#3a3a3a"></stop>
+      <stop offset="50%" stop-color="#1d1d1d"></stop>
+      <stop offset="100%" stop-color="#3a3a3a"></stop>
+    </linearGradient>
+  </defs>
+
+  
+  <path d="&#xA;      M 8 220&#xA;      L 8 200&#xA;      C 16 180, 30 160, 56 152&#xA;      C 72 148, 82 144, 86 132&#xA;      L 114 132&#xA;      C 118 144, 128 148, 144 152&#xA;      C 170 160, 184 180, 192 200&#xA;      L 192 220&#xA;      Z" fill="url(#silHi)"></path>
+
+  
+  <path d="&#xA;      M 8 200&#xA;      C 16 180, 30 160, 56 152&#xA;      M 192 200&#xA;      C 184 180, 170 160, 144 152" fill="none" stroke="#2a2a2a" stroke-width="1.4" stroke-linecap="round"></path>
+
+  
+  <path d="M 84 130 C 92 138, 108 138, 116 130 L 116 142 C 108 146, 92 146, 84 142 Z" fill="#000" opacity="0.55"></path>
+
+  
+  <path d="&#xA;      M 100 14&#xA;      C 78 14, 60 28, 56 50&#xA;      C 53 64, 56 78, 58 88&#xA;      C 56 92, 56 100, 60 106&#xA;      C 62 116, 70 126, 84 132&#xA;      C 92 136, 108 136, 116 132&#xA;      C 130 126, 138 116, 140 106&#xA;      C 144 100, 144 92, 142 88&#xA;      C 144 78, 147 64, 144 50&#xA;      C 140 28, 122 14, 100 14 Z" fill="url(#silHi)"></path>
+
+  
+  <path d="&#xA;      M 60 50&#xA;      C 64 36, 76 24, 90 22&#xA;      C 94 16, 106 16, 112 22&#xA;      C 124 22, 132 28, 138 38&#xA;      C 140 30, 130 18, 116 14&#xA;      C 110 10, 92 10, 86 14&#xA;      C 72 18, 62 32, 60 50 Z" fill="#0a0a0a"></path>
+
+  
+  <path d="&#xA;      M 70 32&#xA;      C 80 22, 96 18, 110 22&#xA;      C 122 24, 132 32, 138 42&#xA;      C 132 36, 122 30, 112 30&#xA;      C 100 28, 86 30, 76 38&#xA;      C 72 36, 70 34, 70 32 Z" fill="#1a1a1a" opacity="0.85"></path>
+
+  
+  <path d="&#xA;      M 138 50&#xA;      C 142 62, 142 80, 140 92&#xA;      C 138 84, 138 70, 138 50 Z" fill="#1f1f1f" opacity="0.7"></path>
+
+  
+  <path d="M 56 78 C 54 84, 54 92, 58 96" fill="none" stroke="none"></path>
+  <path d="M 144 78 C 146 84, 146 92, 142 96" fill="none" stroke="none"></path>
+
+  
+  <path d="&#xA;      M 56 152&#xA;      C 70 156, 86 158, 100 158&#xA;      C 114 158, 130 156, 144 152" fill="none" stroke="#222" stroke-width="1.2"></path>
+</svg>

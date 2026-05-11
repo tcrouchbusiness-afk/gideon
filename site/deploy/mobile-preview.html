@@ -1,0 +1,280 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>RIDGELINE — Mobile Preview</title>
+<meta name="viewport" content="width=1240, initial-scale=1" />
+<style>
+  :root {
+    --bg: #0E1010;
+    --panel: #16191A;
+    --line: rgba(255,255,255,0.10);
+    --fg: #E8E6DF;
+    --fg-2: #9A958A;
+    --olive: #93A26B;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: var(--bg); color: var(--fg); font-family: -apple-system, system-ui, sans-serif; }
+
+  .wrap {
+    min-height: 100vh;
+    padding: 32px 32px 64px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 24px;
+  }
+
+  .header {
+    display: flex; align-items: baseline; gap: 16px;
+    width: 100%;
+    max-width: 1140px;
+    border-bottom: 1px solid var(--line);
+    padding-bottom: 20px;
+    margin-bottom: 8px;
+  }
+  .header h1 {
+    font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace;
+    font-size: 13px; font-weight: 500; margin: 0;
+    color: var(--olive);
+    letter-spacing: 2px; text-transform: uppercase;
+  }
+  .header .sub {
+    font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace;
+    font-size: 11px; color: var(--fg-2);
+    letter-spacing: 1.4px; text-transform: uppercase;
+  }
+  .header .sep { color: var(--fg-2); opacity: 0.4; }
+
+  /* tabs */
+  .tabs {
+    display: flex;
+    gap: 0;
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    overflow: hidden;
+    background: var(--panel);
+  }
+  .tab {
+    appearance: none;
+    background: transparent;
+    border: 0;
+    border-right: 1px solid var(--line);
+    color: var(--fg-2);
+    font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace;
+    font-size: 11px;
+    letter-spacing: 1.6px;
+    text-transform: uppercase;
+    padding: 12px 22px;
+    cursor: pointer;
+    transition: color .15s, background .15s;
+  }
+  .tab:last-child { border-right: 0; }
+  .tab:hover { color: var(--fg); background: rgba(255,255,255,0.02); }
+  .tab.active { color: #0E1010; background: var(--olive); }
+  .tab .dot {
+    display: inline-block;
+    width: 5px; height: 5px;
+    border-radius: 50%;
+    background: currentColor;
+    margin-right: 8px;
+    vertical-align: middle;
+    opacity: 0.7;
+  }
+
+  /* device row */
+  .devices {
+    display: flex;
+    gap: 56px;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .device-col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+  }
+  .device-label {
+    font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace;
+    font-size: 10px;
+    letter-spacing: 1.6px;
+    text-transform: uppercase;
+    color: var(--fg-2);
+  }
+  .device-label .px { color: var(--fg); }
+
+  /* iframe inside device frame */
+  .frame-iframe {
+    width: 100%;
+    height: 100%;
+    border: 0;
+    background: #0E1010;
+    display: block;
+  }
+
+  /* footer hint */
+  .hint {
+    font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace;
+    font-size: 11px;
+    color: var(--fg-2);
+    letter-spacing: 1.2px;
+    margin-top: 8px;
+    opacity: 0.7;
+  }
+
+  .hint a {
+    color: var(--olive);
+    text-decoration: none;
+    border-bottom: 1px dotted currentColor;
+  }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="header">
+      <h1>◉ RIDGELINE / MOBILE PREVIEW</h1>
+      <span class="sep">›</span>
+      <span class="sub" id="page-label">HOME</span>
+      <span class="sep" style="margin-left:auto">·</span>
+      <span class="sub">3 VIEWPORTS</span>
+    </div>
+
+    <div class="tabs" id="tabs">
+      <button class="tab active" data-page="index.html#home"><span class="dot"></span>HOME</button>
+      <button class="tab" data-page="index.html#platform"><span class="dot"></span>PLATFORM</button>
+      <button class="tab" data-page="index.html#mission"><span class="dot"></span>MISSION</button>
+      <button class="tab" data-page="index.html#contact"><span class="dot"></span>CONTACT</button>
+    </div>
+
+    <div class="devices" id="devices"></div>
+
+    <div class="hint">Scroll inside any device · Tap tabs to switch pages · Live frames render the actual site CSS</div>
+  </div>
+
+  <script>
+    const VIEWPORTS = [
+      { label: 'iPhone SE',      w: 375,  h: 720, scale: 0.95 },
+      { label: 'iPhone 14 Pro',  w: 414,  h: 800, scale: 0.95 },
+      { label: 'iPad mini',      w: 768,  h: 900, scale: 0.6  },
+    ];
+
+    const devicesEl = document.getElementById('devices');
+    const tabsEl = document.getElementById('tabs');
+    const pageLabel = document.getElementById('page-label');
+    let currentPage = 'index.html#home';
+
+    function buildDeviceCol(vp) {
+      const col = document.createElement('div');
+      col.className = 'device-col';
+
+      const visualW = vp.w * vp.scale;
+      const visualH = vp.h * vp.scale;
+
+      // wrapper that defines the visible footprint at scaled size
+      const shell = document.createElement('div');
+      shell.style.cssText = `
+        width: ${visualW}px;
+        height: ${visualH}px;
+        position: relative;
+        overflow: hidden;
+        border-radius: ${48 * vp.scale}px;
+        box-shadow: 0 40px 80px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.06);
+        background: #000;
+      `;
+
+      // inner: actual device size, scaled down via transform
+      const inner = document.createElement('div');
+      inner.style.cssText = `
+        width: ${vp.w}px;
+        height: ${vp.h}px;
+        transform: scale(${vp.scale});
+        transform-origin: top left;
+        position: relative;
+        background: #0E1010;
+      `;
+
+      // dynamic island
+      const island = document.createElement('div');
+      island.style.cssText = `
+        position: absolute; top: 11px; left: 50%; transform: translateX(-50%);
+        width: 126px; height: 37px; border-radius: 24px; background: #000;
+        z-index: 50;
+      `;
+      inner.appendChild(island);
+
+      // status bar
+      const sb = document.createElement('div');
+      sb.style.cssText = `
+        position: absolute; top: 0; left: 0; right: 0; height: 54px;
+        display: flex; align-items: center; justify-content: space-between;
+        padding: 21px 28px 19px; z-index: 20; pointer-events: none;
+        font-family: -apple-system, "SF Pro", system-ui;
+        font-weight: 590; font-size: 17px; color: #fff;
+      `;
+      sb.innerHTML = `
+        <span>9:41</span>
+        <span style="display:flex; gap:6px; align-items:center;">
+          <svg width="19" height="12" viewBox="0 0 19 12"><rect x="0" y="7.5" width="3.2" height="4.5" rx="0.7" fill="#fff"/><rect x="4.8" y="5" width="3.2" height="7" rx="0.7" fill="#fff"/><rect x="9.6" y="2.5" width="3.2" height="9.5" rx="0.7" fill="#fff"/><rect x="14.4" y="0" width="3.2" height="12" rx="0.7" fill="#fff"/></svg>
+          <svg width="17" height="12" viewBox="0 0 17 12"><path d="M8.5 3.2C10.8 3.2 12.9 4.1 14.4 5.6L15.5 4.5C13.7 2.7 11.2 1.5 8.5 1.5C5.8 1.5 3.3 2.7 1.5 4.5L2.6 5.6C4.1 4.1 6.2 3.2 8.5 3.2Z" fill="#fff"/><circle cx="8.5" cy="10.5" r="1.5" fill="#fff"/></svg>
+          <svg width="27" height="13" viewBox="0 0 27 13"><rect x="0.5" y="0.5" width="23" height="12" rx="3.5" stroke="#fff" stroke-opacity="0.35" fill="none"/><rect x="2" y="2" width="20" height="9" rx="2" fill="#fff"/></svg>
+        </span>
+      `;
+      inner.appendChild(sb);
+
+      // home indicator
+      const home = document.createElement('div');
+      home.style.cssText = `
+        position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%);
+        width: 139px; height: 5px; border-radius: 100px;
+        background: rgba(255,255,255,0.4); z-index: 60; pointer-events: none;
+      `;
+      inner.appendChild(home);
+
+      // iframe holding the actual page (offset for status bar, with bottom safe area)
+      const iframe = document.createElement('iframe');
+      iframe.className = 'frame-iframe';
+      iframe.src = currentPage;
+      iframe.dataset.vp = vp.label;
+      iframe.style.cssText = `
+        position: absolute;
+        top: 0; left: 0;
+        width: ${vp.w}px;
+        height: ${vp.h}px;
+        border: 0;
+        background: #0E1010;
+      `;
+      inner.appendChild(iframe);
+
+      shell.appendChild(inner);
+
+      const lbl = document.createElement('div');
+      lbl.className = 'device-label';
+      lbl.innerHTML = `${vp.label} <span class="px">${vp.w}×${vp.h}</span>`;
+
+      col.appendChild(shell);
+      col.appendChild(lbl);
+      return col;
+    }
+
+    function render() {
+      devicesEl.innerHTML = '';
+      VIEWPORTS.forEach(vp => devicesEl.appendChild(buildDeviceCol(vp)));
+    }
+
+    tabsEl.addEventListener('click', (e) => {
+      const tab = e.target.closest('.tab');
+      if (!tab) return;
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      currentPage = tab.dataset.page;
+      pageLabel.textContent = tab.textContent.trim();
+      render();
+    });
+
+    render();
+  </script>
+</body>
+</html>
