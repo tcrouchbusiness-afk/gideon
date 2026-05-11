@@ -6,7 +6,7 @@
 <style>
 * { margin:0; padding:0; box-sizing:border-box; }
 html,body { width:100%; height:100%; background:#0b140b; overflow:hidden; display:flex; align-items:center; justify-content:center; }
-canvas { display:block; }
+canvas { display:block; touch-action: none; }
 #hud {
   position:fixed; top:0; left:0; width:100%; height:100%;
   pointer-events:none; font-family:'Courier New',monospace;
@@ -2248,6 +2248,7 @@ async function init() {
     }
 
     canvas.addEventListener('touchstart', e => {
+      if (e.touches.length >= 2) e.preventDefault();
       if (e.touches.length === 2) {
         _pinching = true;
         _touchRotating = false;
@@ -2258,9 +2259,10 @@ async function init() {
         _touchLastX  = _touchStartX;
         _touchRotating = false;
       }
-    }, { passive: true });
+    }, { passive: false });
 
     canvas.addEventListener('touchmove', e => {
+      if (e.touches.length >= 2) e.preventDefault();
       if (e.touches.length === 2 && _pinching) {
         const dist = _pinchDist(e.touches);
         const newZ = camera.position.z * (_pinchDist0 / dist);
@@ -2279,7 +2281,7 @@ async function init() {
           _touchLastX = x;
         }
       }
-    }, { passive: true });
+    }, { passive: false });
 
     canvas.addEventListener('touchend', e => {
       if (e.touches.length < 2) _pinching = false;
