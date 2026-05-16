@@ -56,6 +56,63 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 }
 .nav-cta:hover { background: var(--olive); border-color: var(--olive); color: #0d1410; }
 
+/* splash screen */
+.splash {
+  position: fixed; inset: 0; z-index: 9999;
+  background: #070c09;
+  display: flex; align-items: center; justify-content: center;
+  opacity: 1;
+  transition: opacity 0.6s ease;
+}
+.splash--out { opacity: 0; pointer-events: none; }
+
+.splash-term {
+  width: min(520px, 88vw);
+  font-family: var(--mono);
+}
+.splash-term-hdr {
+  font-size: 11px;
+  color: var(--olive-2);
+  letter-spacing: 0.16em;
+  margin-bottom: 18px;
+  text-transform: uppercase;
+}
+.splash-line {
+  font-size: 13px;
+  color: var(--fg-2);
+  line-height: 1.9;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.splash-line--ok { color: var(--olive-2); }
+
+.splash-cursor {
+  display: inline-block;
+  width: 8px; height: 14px;
+  background: var(--olive-2);
+  vertical-align: middle;
+  margin-left: 2px;
+  animation: cur-blink 1s steps(2) infinite;
+}
+@keyframes cur-blink { from, to { opacity: 1; } 50% { opacity: 0; } }
+
+.splash-reveal {
+  margin-top: 28px;
+  display: flex; flex-direction: column; gap: 8px;
+  opacity: 0; transform: translateY(6px);
+  transition: opacity 0.4s ease, transform 0.4s ease;
+  pointer-events: none;
+}
+.splash-reveal--vis { opacity: 1; transform: translateY(0); }
+.splash-reveal-name {
+  font-size: 14px; letter-spacing: 0.2em; font-weight: 600; color: var(--fg);
+}
+.splash-reveal-tag {
+  font-size: 10px; letter-spacing: 0.22em; color: var(--olive-2);
+}
+
 /* page transitions */
 @keyframes page-enter {
   from { opacity: 0; transform: translateY(8px); }

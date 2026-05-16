@@ -68,6 +68,7 @@
   <script type="text/babel" src="globe.jsx"></script>
   <script type="text/babel" src="globe-tile.jsx"></script>
   <script type="text/babel" src="nav.jsx"></script>
+  <script type="text/babel" src="splash.jsx"></script>
   <script type="text/babel" src="hero.jsx"></script>
   <script type="text/babel" src="page-home.jsx"></script>
   <script type="text/babel" src="page-other.jsx"></script>
@@ -127,6 +128,9 @@
     function App() {
       const [t, setTweak] = useTweaks(TWEAK_DEFAULTS);
       const [route, setRoute] = React.useState('home');
+      const [splashDone, setSplashDone] = React.useState(
+        () => !!sessionStorage.getItem('gd-splash')
+      );
       const [enterKey, setEnterKey] = React.useState(0);
       const initialNav = React.useRef(true);
 
@@ -159,8 +163,14 @@
       else if (route === 'mission')      page = <MissionPage />;
       else if (route === 'contact')      page = <ContactPage />;
 
+      const handleSplashDone = React.useCallback(() => {
+        sessionStorage.setItem('gd-splash', '1');
+        setSplashDone(true);
+      }, []);
+
       return (
         <>
+          {!splashDone && <SplashScreen onDone={handleSplashDone} />}
           {t.showClassification && <Classification />}
           <Nav route={route} setRoute={go} />
           <main><div key={enterKey} className={enterKey > 0 ? 'page-enter' : ''}>{page}</div></main>
