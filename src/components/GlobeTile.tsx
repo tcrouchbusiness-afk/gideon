@@ -9,11 +9,17 @@
 // To revert to the original live-globe behavior, set MODE = 'live'.
 
 import { useState, useEffect, useRef } from 'react'
-import GlobePosture from './Globe'
 
 const MODE: 'poster' | 'live' | 'lazy' = 'poster'
 
-const LiveGlobe = () => <GlobePosture />
+const LiveGlobe = () => (
+  <iframe
+    src="/gideon_globe.html"
+    title="Gideon Dynamics Global Posture"
+    style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', border: 'none' }}
+    loading="lazy"
+  />
+)
 
 // Lazy variant — only mounts the live globe when the wrapper is visible
 const LazyGlobe = () => {

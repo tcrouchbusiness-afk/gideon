@@ -1,0 +1,2376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Gideon Dynamics — Global Ops</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+html,body { width:100%; height:100%; background:#0b140b; overflow:hidden; display:flex; align-items:center; justify-content:center; }
+canvas { display:block; touch-action: none; }
+#hud {
+  position:fixed; top:0; left:0; width:100%; height:100%;
+  pointer-events:none; font-family:'Courier New',monospace;
+}
+.cor { position:absolute; width:20px; height:20px; border-color:#4a8a44; border-style:solid; }
+#c1{top:10px;left:10px;border-width:1px 0 0 1px}
+#c2{top:10px;right:10px;border-width:1px 1px 0 0}
+#c3{bottom:10px;left:10px;border-width:0 0 1px 1px}
+#c4{bottom:10px;right:10px;border-width:0 1px 1px 0}
+.panel { position:absolute; font-size:9px; color:#4aaa38; letter-spacing:1.1px; line-height:1.9; }
+#p1{top:16px;left:16px}
+#p2{top:16px;right:16px;text-align:right}
+#p3{bottom:28px;left:16px}
+#p4{bottom:28px;right:16px;text-align:right}
+#legend {
+  position:absolute; bottom:52px; left:50%; transform:translateX(-50%);
+  display:flex; gap:14px; font-size:8px; letter-spacing:0.8px; color:#5ab848;
+  white-space:nowrap; background:rgba(0,0,0,0.45); padding:5px 12px; border:1px solid #1a3a14;
+}
+#slider-wrap {
+  position:absolute; bottom:14px; left:50%; transform:translateX(-50%);
+  display:flex; align-items:center; gap:10px;
+  background:rgba(0,0,0,0.55); border:1px solid #1a3a14;
+  padding:5px 14px; white-space:nowrap; pointer-events:all;
+}
+#slider-wrap label {
+  font-family:'Courier New',monospace; font-size:8px; letter-spacing:1px; color:#4aaa38;
+}
+#rot-slider-canvas {
+  cursor:pointer; display:block; pointer-events:all;
+}
+#auto-btn {
+  font-family:'Courier New',monospace; font-size:8px; letter-spacing:1px;
+  color:#4aaa38; background:transparent; border:1px solid #1e4a18;
+  padding:2px 8px; cursor:pointer; pointer-events:all;
+}
+#auto-btn:hover { background:#1a3a14; color:#4cdd30; }
+#auto-btn.active { background:#1a3a14; color:#4cdd30; border-color:#4cdd30; }
+.li { display:flex; align-items:center; gap:5px; }
+.ld { width:7px; height:7px; border-radius:50%; }
+#loading {
+  position:fixed; top:50%; left:50%; transform:translate(-50%,-50%);
+  color:#4aaa38; font-family:'Courier New',monospace; font-size:11px;
+  letter-spacing:2px;
+}
+/* Pull-out legend panel */
+/* Legend wrapper — slides as a unit (tab + panel together) */
+/* Closed via transform; .open removes it. Fixed values per breakpoint avoid
+   a Chrome bug where transitioning between calc(var()) values across media-query
+   changes leaves the wrapper stuck at the closed value. */
+#legend-wrap {
+  position:absolute; top:0; right:0; height:100%;
+  display:flex; flex-direction:row; align-items:stretch;
+  transform: translateX(230px);
+  transition: transform 0.3s ease; pointer-events:all; z-index:100;
+}
+#legend-wrap.open { transform: translateX(0); }
+#legend-toggle {
+  writing-mode:vertical-rl; text-orientation:mixed;
+  transform:rotate(180deg);
+  background:rgba(0,0,0,0.85); border:1px solid #1e4a18; border-right:none;
+  color:#4aaa38; font-family:'Courier New',monospace; font-size:9px;
+  letter-spacing:2px; padding:10px 5px; cursor:pointer;
+  pointer-events:all; outline:none; flex-shrink:0; align-self:center;
+  transition:background 0.2s; user-select:none; height:80px;
+}
+#legend-toggle:hover, #legend-toggle:focus { background:#0d200d; color:#4cdd30; outline:none; }
+#legend-panel {
+  width: 230px; height:100%;
+  background:rgba(5,14,5,0.94); border-left:1px solid #1e4a18;
+  font-family:'Courier New',monospace; font-size:8.5px; color:#5ab848;
+  letter-spacing:0.8px; line-height:1.7; overflow-y:auto;
+  pointer-events:all; flex-shrink:0;
+}
+#legend-panel .lp-head {
+  padding:12px 12px 8px; border-bottom:1px solid #1e4a18;
+  color:#4cdd30; font-size:9px; letter-spacing:1.5px; line-height:1.5;
+}
+#legend-panel .lp-section {
+  padding:8px 12px 4px; border-bottom:1px solid #111e11;
+}
+#legend-panel .lp-title {
+  color:#4cdd30; font-size:9px; letter-spacing:2.5px; margin-bottom:6px;
+  font-weight:bold; border-bottom:1px solid #1e4a18; padding-bottom:3px;
+}
+#legend-panel .lp-row {
+  display:flex; align-items:center; gap:7px; margin-bottom:4px; line-height:1.4;
+}
+#legend-panel .lp-icon {
+  width:16px; height:16px; flex-shrink:0; display:flex;
+  align-items:center; justify-content:center;
+}
+#legend-panel .lp-desc { color:#4aaa38; font-size:8px; }
+#legend-panel .lp-desc b { color:#4a9a40; }
+#legend-panel .lp-sources {
+  padding:8px 12px; color:#4a8a44; font-size:7.5px; line-height:1.6;
+}
+
+/* Cyber threat detail popup */
+#cyber-popup {
+  position:fixed; display:none; z-index:999;
+  width:224px;
+  background:rgba(4,11,4,0.97);
+  border:1px solid #1e4a18;
+  font-family:'Courier New',monospace;
+  font-size:8.5px; color:#5ab848;
+  letter-spacing:0.7px; line-height:1.6;
+  pointer-events:all;
+}
+#cyber-popup .cp-header {
+  display:flex; justify-content:space-between; align-items:center;
+  padding:7px 10px 6px; border-bottom:1px solid #162e16;
+}
+#cyber-popup .cp-badge {
+  font-size:8px; font-weight:bold; letter-spacing:1.5px;
+  padding:2px 7px; border:1px solid;
+}
+#cyber-popup .cp-tag {
+  font-size:9px; color:#4aaa38; letter-spacing:1px;
+}
+#cyber-popup .cp-close {
+  background:transparent; border:none; color:#4aaa38;
+  font-size:12px; cursor:pointer; padding:0 2px; line-height:1;
+  pointer-events:all;
+}
+#cyber-popup .cp-close:hover { color:#4cdd30; }
+#cyber-popup .cp-city {
+  padding:5px 10px 2px;
+  font-size:11px; color:#4cdd30; letter-spacing:1px; font-weight:bold;
+}
+#cyber-popup .cp-subtitle {
+  padding:0 10px 6px;
+  font-size:7.5px; color:#4a8a44; letter-spacing:1.5px;
+  border-bottom:1px solid #162e16;
+}
+#cyber-popup .cp-body { padding:6px 10px; }
+#cyber-popup .cp-row {
+  display:flex; gap:0; margin-bottom:3px;
+}
+#cyber-popup .cp-key {
+  color:#4a8a44; min-width:72px; flex-shrink:0; letter-spacing:0.5px;
+}
+#cyber-popup .cp-val { color:#5ab848; }
+#cyber-popup .cp-trend-up   { color:#ff5533; }
+#cyber-popup .cp-trend-flat { color:#ffaa00; }
+#cyber-popup .cp-footer {
+  padding:5px 10px; border-top:1px solid #162e16;
+  font-size:7px; color:#4a8a44; letter-spacing:0.5px;
+}
+/* Corner brackets on popup */
+#cyber-popup::before, #cyber-popup::after {
+  content:''; position:absolute; width:8px; height:8px;
+  border-color:#1e4a18; border-style:solid;
+}
+#cyber-popup::before { top:-1px; left:-1px; border-width:1px 0 0 1px; }
+#cyber-popup::after  { top:-1px; right:-1px; border-width:1px 1px 0 0; }
+
+/* Physical conflict detail popup */
+#conflict-popup {
+  position:fixed; display:none; z-index:999;
+  width:234px;
+  background:rgba(10,5,2,0.97);
+  border:1px solid #4a2208;
+  font-family:'Courier New',monospace;
+  font-size:8.5px; color:#8a5a30;
+  letter-spacing:0.7px; line-height:1.6;
+  pointer-events:all;
+}
+#conflict-popup .cf-header {
+  display:flex; justify-content:space-between; align-items:center;
+  padding:7px 10px 6px; border-bottom:1px solid #2e1404;
+}
+#conflict-popup .cf-tier {
+  font-size:8px; font-weight:bold; letter-spacing:1.5px;
+  padding:2px 6px; border:1px solid;
+}
+#conflict-popup .cf-type-badge {
+  font-size:9px; letter-spacing:0.5px; display:flex; align-items:center; gap:4px;
+}
+#conflict-popup .cf-close {
+  background:transparent; border:none; color:#cc8840;
+  font-size:12px; cursor:pointer; padding:0 2px; line-height:1;
+  pointer-events:all;
+}
+#conflict-popup .cf-close:hover { color:#ffaa44; }
+#conflict-popup .cf-city {
+  padding:5px 10px 2px;
+  font-size:11px; color:#ffaa44; letter-spacing:1px; font-weight:bold;
+}
+#conflict-popup .cf-subtitle {
+  padding:0 10px 6px;
+  font-size:7.5px; color:#aa6a30; letter-spacing:1.5px;
+  border-bottom:1px solid #2e1404;
+}
+#conflict-popup .cf-body { padding:6px 10px; }
+#conflict-popup .cf-row {
+  display:flex; gap:0; margin-bottom:3px;
+}
+#conflict-popup .cf-key {
+  color:#aa6a30; min-width:76px; flex-shrink:0; letter-spacing:0.5px;
+}
+#conflict-popup .cf-val { color:#aa6a30; }
+#conflict-popup .cf-trend-up   { color:#ff7733; }
+#conflict-popup .cf-trend-flat { color:#cc8822; }
+#conflict-popup .cf-trend-down { color:#aaaa44; }
+#conflict-popup .cf-footer {
+  padding:5px 10px; border-top:1px solid #2e1404;
+  font-size:7px; color:#3a1a08; letter-spacing:0.5px;
+}
+#conflict-popup::before, #conflict-popup::after {
+  content:''; position:absolute; width:8px; height:8px;
+  border-color:#4a2208; border-style:solid;
+}
+#conflict-popup::before { top:-1px; left:-1px; border-width:1px 0 0 1px; }
+#conflict-popup::after  { top:-1px; right:-1px; border-width:1px 1px 0 0; }
+
+/* Left-side operations panel */
+/* OPS wrapper — slides as a unit; transform-based animation, see #legend-wrap */
+#ops-wrap {
+  position:absolute; top:0; left:0; height:100%;
+  display:flex; flex-direction:row; align-items:stretch;
+  transform: translateX(-240px);
+  transition: transform 0.3s ease; pointer-events:all; z-index:100;
+}
+#ops-wrap.open { transform: translateX(0); }
+#ops-toggle {
+  writing-mode:vertical-rl; text-orientation:mixed;
+  transform:rotate(180deg);
+  background:rgba(0,0,0,0.85); border:1px solid #1e4a18; border-left:none;
+  color:#4aaa38; font-family:'Courier New',monospace; font-size:9px;
+  letter-spacing:2px; padding:10px 5px; cursor:pointer;
+  pointer-events:all; outline:none; flex-shrink:0; align-self:center;
+  transition:background 0.2s; user-select:none; height:60px; order:2;
+}
+#ops-toggle:hover, #ops-toggle:focus { background:#0d200d; color:#4cdd30; outline:none; }
+#ops-panel {
+  width: 240px; height:100%;
+  background:rgba(5,14,5,0.94); border-right:1px solid #1e4a18;
+  font-family:'Courier New',monospace; font-size:8.5px; color:#5ab848;
+  letter-spacing:0.8px; line-height:1.7; overflow-y:auto;
+  pointer-events:all; flex-shrink:0; order:1;
+}
+#ops-panel .op-head {
+  padding:12px 12px 8px; border-bottom:1px solid #1e4a18;
+  color:#4cdd30; font-size:9px; letter-spacing:1.5px; line-height:1.5;
+}
+#ops-panel .op-section {
+  padding:8px 12px 4px; border-bottom:1px solid #111e11;
+}
+#ops-panel .op-title {
+  color:#4cdd30; font-size:9px; letter-spacing:2.5px; margin-bottom:6px;
+  font-weight:bold; border-bottom:1px solid #1e4a18; padding-bottom:3px;
+}
+#ops-panel .op-row {
+  display:flex; align-items:flex-start; gap:7px; margin-bottom:5px;
+}
+#ops-panel .op-icon {
+  width:16px; height:16px; flex-shrink:0; display:flex;
+  align-items:center; justify-content:center; font-size:12px;
+}
+#ops-panel .op-desc { color:#4aaa38; font-size:8px; line-height:1.5; }
+#ops-panel .op-desc b { color:#4a9a40; }
+#ops-panel .op-node-type {
+  font-size:7px; color:#4a8a44; letter-spacing:1px;
+}
+#ops-panel .op-disclaimer {
+  padding:8px 12px; color:#4a8a44; font-size:7.5px; line-height:1.6;
+  border-top:1px solid #111e11;
+}
+
+/* Custom scrollbars for panels */
+#ops-panel::-webkit-scrollbar,
+#legend-panel::-webkit-scrollbar { width:4px; }
+#ops-panel::-webkit-scrollbar-track,
+#legend-panel::-webkit-scrollbar-track { background:#0b140b; }
+#ops-panel::-webkit-scrollbar-thumb,
+#legend-panel::-webkit-scrollbar-thumb { background:#1e4a18; border-radius:0; }
+#ops-panel::-webkit-scrollbar-thumb:hover,
+#legend-panel::-webkit-scrollbar-thumb:hover { background:#2a6020; }
+/* Firefox */
+#ops-panel, #legend-panel {
+  scrollbar-width:thin;
+  scrollbar-color:#1e4a18 #0b140b;
+}
+
+/* Mobile / narrow-iframe rules — keeps legend + slider inside viewport */
+@media (max-width: 600px) {
+  /* Wrap legend chips to two rows, smaller gap */
+  #legend {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 6px 10px;
+    max-width: 92%;
+    bottom: 56px;
+    font-size: 7.5px;
+    letter-spacing: 0.6px;
+  }
+  /* Shrink rotation slider so it doesn't overflow */
+  #slider-wrap {
+    bottom: 10px;
+    padding: 4px 10px;
+    gap: 6px;
+  }
+  #slider-wrap label { font-size: 7px; letter-spacing: 0.8px; }
+  #rot-slider-canvas { width: 130px !important; height: 14px; }
+  #auto-btn { font-size: 7px; padding: 2px 6px; }
+  /* Tighten the corner panels */
+  .panel { font-size: 8px; line-height: 1.7; }
+  #p1, #p2 { top: 12px; }
+  #p3, #p4 { bottom: 92px; }   /* lift above wrapped legend */
+  /* Smaller side toggle tabs */
+  #legend-toggle, #ops-toggle {
+    font-size: 7px; letter-spacing: 1px; padding: 8px 4px;
+    height: 70px; min-width: 22px;
+  }
+  /* Side panels fit narrower screens — wrapper offset matches new panel width */
+  #legend-panel { width: 200px; font-size: 8px; }
+  #ops-panel { width: 200px; font-size: 8px; }
+  /* Disable transition: Chrome has a bug where transform transitions across
+     media-query breakpoints leave the wrapper stuck at the closed value. */
+  #legend-wrap, #ops-wrap { transition: none; }
+  #legend-wrap { transform: translateX(200px); }
+  #ops-wrap { transform: translateX(-200px); }
+  #legend-wrap.open { transform: translateX(0); }
+  #ops-wrap.open { transform: translateX(0); }
+}
+@media (max-width: 420px) {
+  #legend { font-size: 7px; gap: 4px 8px; bottom: 60px; }
+  #rot-slider-canvas { width: 100px !important; }
+  #legend-panel, #ops-panel { width: 180px; }
+  #legend-wrap { transform: translateX(180px); }
+  #ops-wrap { transform: translateX(-180px); }
+  #legend-wrap.open { transform: translateX(0); }
+  #ops-wrap.open { transform: translateX(0); }
+}
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div id="loading">LOADING MAP DATA...</div>
+<div id="hud" style="display:none">
+  <div class="cor" id="c1"></div><div class="cor" id="c2"></div>
+  <div class="cor" id="c3"></div><div class="cor" id="c4"></div>
+  <div class="panel" id="p1">GIDEON DYNAMICS<br>GLOBAL OPS OVERLAY<br>DEPLOYMENTS ILLUSTRATIVE</div>
+  <div class="panel" id="p2">STATUS: LIVE<br>THEATERS: 9</div>
+  <div class="panel" id="p3">NODES: 5 · FWD: 5</div>
+  <div class="panel" id="p4">ALLIED GOV: 2</div>
+  <div id="legend">
+    <div class="li"><svg width="10" height="10"><polygon points="5,1 9,5 5,9 1,5" fill="#cc000099" stroke="#ff4444" stroke-width="1"/></svg><span style="color:#ff5533">HOSTILE</span></div>
+    <div class="li"><svg width="10" height="10"><polygon points="5,1 9,5 5,9 1,5" fill="none" stroke="#ffaa00" stroke-width="1"/></svg><span style="color:#ffbb22">INTRUSION</span></div>
+    <div class="li"><svg width="10" height="10"><polygon points="5,1 9,5 5,9 1,5" fill="none" stroke="#aa77ff" stroke-width="1"/></svg><span style="color:#bb88ff">PENDING</span></div>
+    <div class="li"><svg width="10" height="10"><polygon points="5,1 9,9 1,9" fill="#ff550099" stroke="#ff8800" stroke-width="1.5"/></svg><span style="color:#ff8855">MAJOR WAR</span></div>
+    <div class="li"><svg width="10" height="10"><polygon points="5,1 9,9 1,9" fill="none" stroke="#ff9944" stroke-width="1.2"/></svg><span style="color:#ff9944">HIGH CONFLICT</span></div>
+    <div class="li"><svg width="10" height="10"><polygon points="5,1 9,9 1,9" fill="none" stroke="#dd3399" stroke-width="1"/></svg><span style="color:#dd3399">ACTIVE</span></div>
+    <div class="li"><div class="ld" style="background:#4cdd30"></div><span style="color:#4cdd30">HUB</span></div>
+    <div class="li"><div class="ld" style="background:#30aadd"></div><span style="color:#30aadd">ALLIED</span></div>
+  </div>
+  <div id="ops-wrap">
+    <div id="ops-panel">
+      <div class="op-head" style="display:flex;justify-content:space-between;align-items:flex-start;">
+        <div>GIDEON DYNAMICS<br>OPERATIONS STATUS<br><span style="color:#4cdd30">NODES: 5 · FWD OPS: 5</span></div>
+        <button onclick="document.getElementById('ops-wrap').classList.remove('open');document.getElementById('ops-toggle').textContent='⬡ OPS';" style="background:transparent;border:1px solid #1e4a18;color:#4aaa38;font-family:'Courier New',monospace;font-size:10px;cursor:pointer;padding:2px 6px;pointer-events:all;flex-shrink:0;margin-left:8px">✕</button>
+      </div>
+      <div class="op-section">
+        <div class="op-title">━ PLATFORM NODES</div>
+        <div class="op-row"><div class="op-icon" style="color:#4cdd30">⬡</div><div class="op-desc"><b>ARLINGTON, VA</b><br><span class="op-node-type">HQ FUSION</span><br>[01] AXEHEAD · [02] CARTOGRAPHER · [03] REDOUBT</div></div>
+        <div class="op-row"><div class="op-icon" style="color:#4cdd30">⬡</div><div class="op-desc"><b>AUSTIN, TX</b><br><span class="op-node-type">FORWARD — ENGINEERING</span><br>[02] CARTOGRAPHER · [03] REDOUBT</div></div>
+        <div class="op-row"><div class="op-icon" style="color:#4cdd30">⬡</div><div class="op-desc"><b>COL SPRINGS, CO</b><br><span class="op-node-type">FORWARD — SIGNALS/SPACE</span><br>[01] AXEHEAD · [02] CARTOGRAPHER · [03] REDOUBT</div></div>
+        <div class="op-row"><div class="op-icon" style="color:#30aadd">⬡</div><div class="op-desc"><b>LONDON, UK</b><br><span class="op-node-type">ALLIED — SOVEREIGN</span><br>[03] REDOUBT · Licensing: Sovereign-Aligned</div></div>
+        <div class="op-row"><div class="op-icon" style="color:#30aadd">⬡</div><div class="op-desc"><b>RIYADH, SA</b><br><span class="op-node-type">ALLIED — SOVEREIGN</span><br>[03] REDOUBT · Licensing: Sovereign-Aligned</div></div>
+      </div>
+      <div class="op-section">
+        <div class="op-title">━ FORWARD COLLECTION (CARTOGRAPHER)</div>
+        <div class="op-row"><div class="op-icon" style="color:#4cdd30;font-size:9px">◉</div><div class="op-desc"><b>KYIV, UA</b> — Critical infra · Energy grid · Gov IT</div></div>
+        <div class="op-row"><div class="op-icon" style="color:#4cdd30;font-size:9px">◉</div><div class="op-desc"><b>TEL AVIV, IL</b> — IDF perimeter · Dual-use infra</div></div>
+        <div class="op-row"><div class="op-icon" style="color:#4cdd30;font-size:9px">◉</div><div class="op-desc"><b>GOMA, DRC</b> — Mineral supply chain · UN logistics</div></div>
+        <div class="op-row"><div class="op-icon" style="color:#4cdd30;font-size:9px">◉</div><div class="op-desc"><b>SEOUL, KR</b> — Semiconductor supply · Finance networks</div></div>
+        <div class="op-row"><div class="op-icon" style="color:#4cdd30;font-size:9px">◉</div><div class="op-desc"><b>WARSAW, PL</b> — Gov IT · NATO logistics · Transport</div></div>
+      </div>
+      <div class="op-section">
+        <div class="op-title">━ PLATFORM KEY</div>
+        <div class="op-row"><div class="op-icon" style="color:#4cdd30;font-size:8px">[01]</div><div class="op-desc"><b>AXEHEAD</b> — Offensive Penetration<br>Class: Offensive · Operators: TS/SCI<br>Effects: Validated · Reporting: Sealed<br>Active ops: [REDACTED]</div></div>
+        <div class="op-row"><div class="op-icon" style="color:#4cdd30;font-size:8px">[02]</div><div class="op-desc"><b>CARTOGRAPHER</b> — Network Mapping<br>Scale: 14M endpoints · Refresh: &lt;60s<br>Targets: IT · OT · Cloud · Mode: Passive + Active</div></div>
+        <div class="op-row"><div class="op-icon" style="color:#4cdd30;font-size:8px">[03]</div><div class="op-desc"><b>REDOUBT</b> — Sovereign AI Defense<br>Model: GIDEON-XL · 9B/7BB · Deployment: Air-gap<br>Latency: &lt;600ms · Egress: Zero</div></div>
+      </div>
+      <div class="op-section">
+        <div class="op-title">━ ORBITAL ASSETS (KEPLERIAN)</div>
+        <div class="op-row"><div class="op-icon"><svg width="16" height="16"><line x1="2" y1="8" x2="14" y2="8" stroke="#4cdd30" stroke-width="1.5"/></svg></div><div class="op-desc"><b style="color:#4cdd30">SAT-1</b> ISS-class LEO · 410km · 51.6° · 92.7min</div></div>
+        <div class="op-row"><div class="op-icon"><svg width="16" height="16"><line x1="2" y1="8" x2="14" y2="8" stroke="#4cdd30" stroke-width="1.5" stroke-dasharray="3,2"/></svg></div><div class="op-desc"><b style="color:#4cdd30">SAT-2</b> Starlink LEO · 550km · 53.0° · 95.5min</div></div>
+        <div class="op-row"><div class="op-icon"><svg width="16" height="16"><line x1="2" y1="8" x2="14" y2="8" stroke="#4cdd30" stroke-width="1" stroke-dasharray="1,2"/></svg></div><div class="op-desc"><b style="color:#4cdd30">SAT-3</b> Sun-sync recon · 800km · 98.7° · RAAN +0.9856°/day</div></div>
+      </div>
+      <div class="op-disclaimer">━━━━━━━━━━━━━━━━━━━━<br>DISCLAIMER<br>Deployment locations are illustrative only and do not reflect actual operational infrastructure or targets.<br>━━━━━━━━━━━━━━━━━━━━</div>
+    </div>
+    <button id="ops-toggle">⬡ OPS</button>
+  </div>
+  <div id="legend-wrap">
+    <button id="legend-toggle">≡ INTEL</button>
+    <div id="legend-panel">
+      <div class="lp-head">GIDEON DYNAMICS<br>THREAT INTELLIGENCE<br><span style="color:#4cdd30">LAST UPDATED: LIVE</span></div>
+      <div class="lp-section">
+        <div class="lp-title">━ CYBER THREATS (MIL-STD-2525C)</div>
+        <div class="lp-row"><div class="lp-icon"><svg width="16" height="16"><polygon points="8,2 14,8 8,14 2,8" fill="#cc000099" stroke="#ff4444" stroke-width="1.5"/></svg></div><div class="lp-desc"><b style="color:#ff5533">HOSTILE</b><br>Critical cyber threat. Nation-state ops, &gt;1,000 confirmed incidents.</div></div>
+        <div class="lp-row"><div class="lp-icon"><svg width="16" height="16"><polygon points="8,2 14,8 8,14 2,8" fill="none" stroke="#ffaa00" stroke-width="1.5"/></svg></div><div class="lp-desc"><b style="color:#ffbb22">INTRUSION</b><br>Active intrusion. Confirmed breach, state-linked, ongoing campaign.</div></div>
+        <div class="lp-row"><div class="lp-icon"><svg width="16" height="16"><polygon points="8,2 14,8 8,14 2,8" fill="none" stroke="#aa77ff" stroke-width="1.5"/></svg></div><div class="lp-desc"><b style="color:#bb88ff">PENDING</b><br>Active threat assessment. Monitored activity, attribution underway.</div></div>
+      </div>
+      <div class="lp-section">
+        <div class="lp-title">━ PHYSICAL CONFLICTS (ACLED/SIPRI)</div>
+        <div class="lp-row"><div class="lp-icon"><svg width="16" height="16"><polygon points="8,2 14,14 2,14" fill="#dd4400cc" stroke="#ff8855" stroke-width="2"/></svg></div><div class="lp-desc"><b style="color:#ff7744">MAJOR WAR</b><br>&gt;10,000 deaths/year (SIPRI). Active front lines.</div></div>
+        <div class="lp-row"><div class="lp-icon"><svg width="16" height="16"><polygon points="8,2 14,14 2,14" fill="none" stroke="#ff9944" stroke-width="1.5"/></svg></div><div class="lp-desc"><b style="color:#ff9944">HIGH INTENSITY</b><br>1,000–10,000 deaths/year. Insurgency or proxy.</div></div>
+        <div class="lp-row"><div class="lp-icon"><svg width="16" height="16"><polygon points="8,2 14,14 2,14" fill="none" stroke="#dd3399" stroke-width="1"/></svg></div><div class="lp-desc"><b style="color:#dd3399">ACTIVE</b><br>Sub-threshold. Ongoing insurgency, &lt;1,000/yr.</div></div>
+        <div class="lp-title" style="margin-top:6px">━ CONFLICT TYPES</div>
+        <div class="lp-row"><div class="lp-icon" style="color:#ff4422;font-size:11px">⚔</div><div class="lp-desc"><b style="color:#ff4422">Interstate War</b></div></div>
+        <div class="lp-row"><div class="lp-icon" style="color:#ff7700;font-size:11px">⚡</div><div class="lp-desc"><b style="color:#ff7700">Civil War</b></div></div>
+        <div class="lp-row"><div class="lp-icon" style="color:#ffaa00;font-size:11px">◈</div><div class="lp-desc"><b style="color:#ffaa00">Insurgency</b></div></div>
+        <div class="lp-row"><div class="lp-icon" style="color:#cc44ff;font-size:11px">⬡</div><div class="lp-desc"><b style="color:#cc44ff">Proxy Conflict</b></div></div>
+        <div class="lp-row"><div class="lp-icon" style="color:#ff44aa;font-size:11px">✦</div><div class="lp-desc"><b style="color:#ff44aa">Gang / Cartel</b></div></div>
+        <div class="lp-row"><div class="lp-icon" style="color:#ff2266;font-size:11px">▲</div><div class="lp-desc"><b style="color:#ff2266">Atrocity / Repression</b></div></div>
+      </div>
+      <div class="lp-section">
+        <div class="lp-title">━ OPERATIONS</div>
+        <div class="lp-row"><div class="lp-icon" style="color:#4cdd30;font-size:11px">⬡</div><div class="lp-desc"><b style="color:#4cdd30">GIDEON NODE</b> Platform deployment<br><span style="color:#4a8a44">See ⬡ OPS panel (left) for detail</span></div></div>
+      </div>
+      <div class="lp-sources">SOURCES<br>ACLED 2025 · SIPRI 2025 · Uppsala UCDP 2024<br>CFR 2026 · Crisis Group · CSIS<br>Microsoft DDR 2025 · IBM X-Force · Oxford WCI</div>
+    </div>
+  </div>
+  <div id="slider-wrap">
+    <label>ROTATION</label>
+    <canvas id="rot-slider-canvas" width="200" height="16"></canvas>
+    <button id="auto-btn" class="active" style="pointer-events:all">AUTO</button>
+  </div>
+<!-- Cyber threat detail popup -->
+<div id="cyber-popup">
+  <div class="cp-header">
+    <div style="display:flex;align-items:center;gap:8px">
+      <span class="cp-badge" id="cp-badge">HOSTILE</span>
+      <span class="cp-tag" id="cp-tag">US</span>
+    </div>
+    <button class="cp-close" id="cp-close">✕</button>
+  </div>
+  <div class="cp-city" id="cp-city">WASHINGTON DC</div>
+  <div class="cp-subtitle">CYBER THREAT INTELLIGENCE</div>
+  <div class="cp-body">
+    <div class="cp-row"><span class="cp-key">INCIDENTS</span><span class="cp-val" id="cp-incidents"></span></div>
+    <div class="cp-row"><span class="cp-key">ACTOR</span><span class="cp-val" id="cp-actor"></span></div>
+    <div class="cp-row"><span class="cp-key">VECTORS</span><span class="cp-val" id="cp-vectors"></span></div>
+    <div class="cp-row"><span class="cp-key">TARGETS</span><span class="cp-val" id="cp-targets"></span></div>
+    <div class="cp-row"><span class="cp-key">TREND</span><span class="cp-val" id="cp-trend"></span></div>
+    <div class="cp-row"><span class="cp-key">LAST EVENT</span><span class="cp-val" id="cp-last"></span></div>
+  </div>
+  <div class="cp-footer" id="cp-source"></div>
+</div>
+</div>
+
+<!-- Physical conflict detail popup -->
+<div id="conflict-popup">
+  <div class="cf-header">
+    <div style="display:flex;flex-direction:column;gap:3px">
+      <div style="display:flex;align-items:center;gap:6px">
+        <span class="cf-tier" id="cf-tier">MAJOR WAR</span>
+        <span class="cf-type-badge" id="cf-type-badge">⚔ Interstate War</span>
+      </div>
+    </div>
+    <button class="cf-close" id="cf-close">✕</button>
+  </div>
+  <div class="cf-city" id="cf-city">KYIV, UKRAINE</div>
+  <div class="cf-subtitle">PHYSICAL CONFLICT INTELLIGENCE</div>
+  <div class="cf-body">
+    <div class="cf-row"><span class="cf-key">TYPE</span><span class="cf-val" id="cf-type"></span></div>
+    <div class="cf-row"><span class="cf-key">PARTIES</span><span class="cf-val" id="cf-parties"></span></div>
+    <div class="cf-row"><span class="cf-key">EST DEATHS</span><span class="cf-val" id="cf-deaths"></span></div>
+    <div class="cf-row"><span class="cf-key">STATUS</span><span class="cf-val" id="cf-status"></span></div>
+    <div class="cf-row"><span class="cf-key">TREND</span><span class="cf-val" id="cf-trend"></span></div>
+    <div class="cf-row"><span class="cf-key">LAST EVENT</span><span class="cf-val" id="cf-last"></span></div>
+  </div>
+  <div class="cf-footer" id="cf-source"></div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+// ── Renderer ────────────────────────────────────────────────────────
+const canvas = document.getElementById('c');
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.setClearColor(0x0b140b);
+
+const scene = new THREE.Scene();
+// Narrow FOV + far camera = small globe
+const camera = new THREE.PerspectiveCamera(22, 1, 0.1, 100);
+camera.position.z = 8.2;
+
+function resize() {
+  const W = window.innerWidth, H = window.innerHeight;
+  renderer.setSize(W, H);
+  camera.aspect = W / H;
+  camera.updateProjectionMatrix();
+}
+resize();
+window.addEventListener('resize', resize);
+
+// ── Texture canvas ──────────────────────────────────────────────────
+const TS = 4096, TH = 2048;
+const oc = document.createElement('canvas');
+oc.width = TS; oc.height = TH;
+const g = oc.getContext('2d');
+
+function drawBase() {
+  // Ocean
+  g.fillStyle = '#091409';
+  g.fillRect(0, 0, TS, TH);
+  // Grid lines
+  g.strokeStyle = '#111f11';
+  g.lineWidth = 1;
+  for (let la = -80; la <= 80; la += 20) {
+    const y = (90 - la) / 180 * TH;
+    g.beginPath(); g.moveTo(0, y); g.lineTo(TS, y); g.stroke();
+  }
+  for (let lo = -180; lo <= 180; lo += 30) {
+    const x = (lo + 180) / 360 * TS;
+    g.beginPath(); g.moveTo(x, 0); g.lineTo(x, TH); g.stroke();
+  }
+}
+
+// Convert GeoJSON coordinate [lon, lat] → canvas pixel [x, y]
+function toXY(lon, lat) {
+  return [
+    (lon + 180) / 360 * TS,
+    (90 - lat) / 180 * TH
+  ];
+}
+
+// Draw a single GeoJSON ring (array of [lon,lat] pairs) onto canvas
+// Handles antimeridian by detecting lon jumps > 180
+function drawRing(coords) {
+  if (!coords || coords.length < 2) return;
+  g.beginPath();
+  let [x0, y0] = toXY(coords[0][0], coords[0][1]);
+  g.moveTo(x0, y0);
+  for (let i = 1; i < coords.length; i++) {
+    const dlon = coords[i][0] - coords[i-1][0];
+    if (Math.abs(dlon) > 180) {
+      // antimeridian crossing — lift pen
+      const [nx, ny] = toXY(coords[i][0], coords[i][1]);
+      g.moveTo(nx, ny);
+    } else {
+      const [x, y] = toXY(coords[i][0], coords[i][1]);
+      g.lineTo(x, y);
+    }
+  }
+  g.closePath();
+}
+
+function drawGeoJSON(geojson) {
+  g.fillStyle = '#183414';
+  g.strokeStyle = '#2d6824';
+  g.lineWidth = 1.5;
+
+  function processGeom(geom) {
+    if (!geom) return;
+    if (geom.type === 'Polygon') {
+      g.beginPath();
+      geom.coordinates.forEach(ring => drawRing(ring));
+      g.fill();
+      g.stroke();
+    } else if (geom.type === 'MultiPolygon') {
+      geom.coordinates.forEach(poly => {
+        g.beginPath();
+        poly.forEach(ring => drawRing(ring));
+        g.fill();
+        g.stroke();
+      });
+    }
+  }
+
+  if (geojson.type === 'FeatureCollection') {
+    geojson.features.forEach(f => processGeom(f.geometry));
+  } else if (geojson.type === 'Feature') {
+    processGeom(geojson.geometry);
+  } else {
+    processGeom(geojson);
+  }
+}
+
+// ── Three.js earth setup ────────────────────────────────────────────
+let earthMesh, tex;
+
+function buildEarth() {
+  tex = new THREE.CanvasTexture(oc);
+  tex.needsUpdate = true;
+  const geo = new THREE.SphereGeometry(1.25, 96, 96);
+  const mat = new THREE.MeshBasicMaterial({ map: tex });
+  earthMesh = new THREE.Mesh(geo, mat);
+  // Earth axial tilt: 23.5° — makes globe sit naturally on axis
+  earthMesh.rotation.x = 23.5 * Math.PI / 180;
+  scene.add(earthMesh);
+
+  // Atmosphere
+  const atmM = new THREE.MeshBasicMaterial({
+    color: 0x1a4a14, transparent: true, opacity: 0.10, side: THREE.BackSide
+  });
+  scene.add(new THREE.Mesh(new THREE.SphereGeometry(1.29, 32, 32), atmM));
+}
+
+// ── Satellite Orbital Mechanics — Physically Accurate Implementation ───
+//
+// Sources: CSIS, ISW, eoPortal, SpaceTrack TLE database,
+//   Frontiers in Astronomy 2025 (Oliveira et al.), Wikipedia SSO,
+//   SatBase SSO Designer, Colorado Press Orbital Mechanics textbook,
+//   ScienceDirect SSO determination paper.
+//
+// SAT-1 ISS: alt=410km, inc=51.6408° (exact TLE), e=0.0008685,
+//   argPeri=246.96°, period=92.68min, J2 RAAN drift=−6.93°/day
+// SAT-2 Starlink Shell-1: alt=550km, inc=53.0° (FCC filing), e≈0.000174,
+//   period=95.5min, J2 RAAN drift=−6.63°/day
+// SAT-3 SSO-Recon: alt=800km, inc=98.7° (J2 formula at a=7171km),
+//   e≈0, period=100.9min, J2 RAAN precession=+0.9856°/day (EASTWARD—
+//   the defining SSO property: orbital plane follows Sun 360°/year)
+
+const GM_km3s2   = 3.986004418e5;  // Earth grav. param. km³/s²
+const EARTH_R_KM = 6371.0;
+const J2         = 1.08263e-3;     // Earth J2 oblateness coefficient
+const TIME_SCALE = 800;            // sim-seconds per real-second
+const RAD        = Math.PI / 180;
+const DEG        = 180 / Math.PI;
+
+const SAT_DEFS = [
+  {
+    name: 'ISS',
+    altKm:          410,
+    incDeg:         51.6408,  // exact TLE value
+    raanDeg:        30,
+    m0Deg:          0,
+    argPeriDeg:     246.96,   // perigee in southern hemisphere
+    ecc:            0.0008685,// TLE: slightly elliptical 408–416km
+    raanDotDegPerDay: -6.93,  // J2 westward nodal drift
+    color: 0x4cdd30
+  },
+  {
+    name: 'STARLINK',
+    altKm:          550,
+    incDeg:         53.0,     // FCC-filed Shell-1 spec
+    raanDeg:        160,
+    m0Deg:          120,
+    argPeriDeg:     0,
+    ecc:            0.000174, // SpaceTrack dataset mean
+    raanDotDegPerDay: -6.63,
+    color: 0x4cdd30
+  },
+  {
+    name: 'SSO-RECON',
+    altKm:          800,
+    incDeg:         98.7,     // J2 formula: cos⁻¹(-0.144)=98.7° at a=7171km
+    raanDeg:        280,
+    m0Deg:          240,
+    argPeriDeg:     0,
+    ecc:            0,
+    raanDotDegPerDay: +0.9856,// EASTWARD — 360°/365.25 days = sun-synchronous
+    color: 0x4cdd30
+  },
+];
+
+function orbitalPeriod(altKm) {
+  const a = EARTH_R_KM + altKm;
+  return 2 * Math.PI * Math.sqrt(a * a * a / GM_km3s2);
+}
+
+function orbitalRadius(altKm) {
+  return ((EARTH_R_KM + altKm) / EARTH_R_KM) * 1.25;
+}
+
+function Rx(angDeg) {
+  const m = new THREE.Matrix4(); m.makeRotationX(angDeg * RAD); return m;
+}
+function Rz(angDeg) {
+  const m = new THREE.Matrix4(); m.makeRotationZ(angDeg * RAD); return m;
+}
+
+// Kepler's equation solver: M = E - e·sin(E) → Newton-Raphson
+function solveKepler(M, ecc) {
+  if (ecc < 1e-6) return M;
+  let E = M;
+  for (let i = 0; i < 8; i++) {
+    const dE = (M - E + ecc * Math.sin(E)) / (1 - ecc * Math.cos(E));
+    E += dE;
+    if (Math.abs(dE) < 1e-10) break;
+  }
+  return E;
+}
+
+// True anomaly from eccentric anomaly and eccentricity
+function trueAnomaly(E, ecc) {
+  if (ecc < 1e-6) return E;
+  const sinV = Math.sqrt(1 - ecc * ecc) * Math.sin(E) / (1 - ecc * Math.cos(E));
+  const cosV = (Math.cos(E) - ecc) / (1 - ecc * Math.cos(E));
+  return Math.atan2(sinV, cosV);
+}
+
+// Full Keplerian position including J2 RAAN precession and eccentricity
+function keplerPos(def, tSim) {
+  const T = orbitalPeriod(def.altKm);
+  const n = 2 * Math.PI / T;
+  const M = n * tSim + def.m0Deg * RAD;
+  const E = solveKepler(M, def.ecc);
+  const nu = trueAnomaly(E, def.ecc);
+
+  const a    = orbitalRadius(def.altKm);
+  const rMag = def.ecc < 1e-6
+    ? a
+    : a * (1 - def.ecc * def.ecc) / (1 + def.ecc * Math.cos(nu));
+
+  const u    = nu + def.argPeriDeg * RAD; // argument of latitude
+  const xP   = rMag * Math.cos(u);
+  const yP   = rMag * Math.sin(u);
+
+  // Accumulated RAAN: initial + J2 precession over tSim
+  const raanDotRadPerSec = def.raanDotDegPerDay * RAD / 86400;
+  const raanNow = def.raanDeg * RAD + raanDotRadPerSec * tSim;
+
+  const v = new THREE.Vector3(xP, yP, 0);
+  v.applyMatrix4(Rx(-def.incDeg));
+  v.applyMatrix4(new THREE.Matrix4().makeRotationZ(-raanNow));
+
+  // ECI Z-up → Three.js Y-up
+  return new THREE.Vector3(v.x, v.z, -v.y);
+}
+
+// Build orbit ring geometry from current RAAN (for live SSO drift update)
+function makeSatMesh() {
+  const grp = new THREE.Group();
+  grp.add(new THREE.Mesh(
+    new THREE.BoxGeometry(0.055, 0.022, 0.022),
+    new THREE.MeshBasicMaterial({ color: 0x4cdd30 })
+  ));
+  const pM = new THREE.MeshBasicMaterial({ color: 0x1a5a14 });
+  const pG = new THREE.BoxGeometry(0.085, 0.005, 0.028);
+  const pa = new THREE.Mesh(pG, pM); pa.position.x =  0.072; grp.add(pa);
+  const pb = new THREE.Mesh(pG, pM); pb.position.x = -0.072; grp.add(pb);
+  return grp;
+}
+
+// ── Satellite ring + trail system ──────────────────────────────────
+// Rings: very dim, thin, one per satellite. Different color per sat.
+// Trails: simple ECI-space Vector3 history — short arc behind sat.
+// Ring RAAN updates slowly via J2 precession (SSO most visible).
+
+function buildOrbitRingPts(def, raanRad) {
+  const r = orbitalRadius(def.altKm);
+  const pts = [];
+  for (let i = 0; i <= 128; i++) {
+    const nu = (i / 128) * 2 * Math.PI;
+    const u  = nu + def.argPeriDeg * RAD;
+    const v  = new THREE.Vector3(r * Math.cos(u), r * Math.sin(u), 0);
+    v.applyMatrix4(Rx(-def.incDeg));
+    v.applyMatrix4(new THREE.Matrix4().makeRotationZ(-raanRad));
+    pts.push(new THREE.Vector3(v.x, v.z, -v.y));
+  }
+  return pts;
+}
+
+// Ring: very dim, each sat a distinct dim color
+const RING_COLORS  = [0x1a4a18, 0x143a24, 0x1a3a30]; // ISS, Starlink, SSO
+const RING_OPACITY = [0.18,     0.14,     0.16   ];
+
+// Trail: 80 points, distinct bright color per sat so they're identifiable
+const TRAIL_COLORS   = [0x4cdd30, 0x44bb66, 0x44ddaa]; // ISS green, Starlink mid, SSO teal
+const TRAIL_OPACITY  = [0.70,     0.60,     0.65   ];
+const TRAIL_LEN      = 80;
+const TRAIL_STYLES   = ['solid', 'dashed', 'dotted']; // ISS, Starlink, SSO
+
+// Build trail geometry as explicit segment pairs for dash/dot patterns.
+// LineSegments draws each consecutive pair [A,B], [C,D] as separate segments —
+// so gaps between pairs are real empty space, not rendered at all.
+// 'solid'  → all consecutive pairs: [0,1],[1,2],[2,3]...
+// 'dashed' → draw 3 pairs, skip 3, repeat
+// 'dotted' → draw 1 pair,  skip 3, repeat
+function buildTrailSegments(pts, style) {
+  const pairs = [];
+  const drawLen = style === 'dashed' ? 3 : style === 'dotted' ? 1 : pts.length;
+  const skipLen = style === 'solid'  ? 0 : 3;
+  const cycle   = drawLen + skipLen;
+
+  for (let i = 0; i < pts.length - 1; i++) {
+    if (style === 'solid') {
+      pairs.push(pts[i], pts[i + 1]);
+    } else {
+      const pos = i % cycle;
+      if (pos < drawLen) {
+        pairs.push(pts[i], pts[i + 1]);
+      }
+    }
+  }
+  return pairs;
+}
+
+const sats = SAT_DEFS.map((def, idx) => {
+  const mesh = makeSatMesh();
+  scene.add(mesh);
+
+  // One orbit ring per satellite — very dim
+  const ringPts = buildOrbitRingPts(def, def.raanDeg * RAD);
+  const ringGeo = new THREE.BufferGeometry().setFromPoints(ringPts);
+  const ringMat = new THREE.LineBasicMaterial({
+    color: RING_COLORS[idx], transparent: true,
+    opacity: RING_OPACITY[idx], depthTest: false
+  });
+  const orbitRing = new THREE.Line(ringGeo, ringMat);
+  scene.add(orbitRing);
+
+  // Trail — plain ECI Vector3 history
+  const trailPts = [];
+  const trailGeo = new THREE.BufferGeometry();
+  const trailMat = new THREE.LineBasicMaterial({
+    color: TRAIL_COLORS[idx], transparent: true,
+    opacity: TRAIL_OPACITY[idx], depthTest: true
+  });
+  const trail = new THREE.LineSegments(trailGeo, trailMat);
+  scene.add(trail);
+
+  return { def, mesh, orbitRing, ringGeo, ringMat, trail, trailGeo, trailPts, idx,
+           trailStyle: TRAIL_STYLES[idx] };
+});
+
+// ── Ring precession multiplier ──────────────────────────────────────
+// Scales how fast orbit rings visually precess due to J2 oblateness.
+// 1.0 = physically accurate (imperceptibly slow at TIME_SCALE=800).
+// 8.0 = 8× faster — visibly drifts over ~1-2 minutes of viewing.
+// To revert to accurate physics: change 8.0 → 1.0
+const RING_PRECESSION_MULTIPLIER = 8.0;
+
+// tSim accumulates scaled simulation time
+let tSim = 0;
+
+
+// ── Coordinate helper ───────────────────────────────────────────────
+function ll3d(lat, lon, r = 1.253) {
+  const phi   = (90 - lat)  * Math.PI / 180;
+  const theta = (lon + 180) * Math.PI / 180;
+  return new THREE.Vector3(
+    -r * Math.sin(phi) * Math.cos(theta),
+     r * Math.cos(phi),
+     r * Math.sin(phi) * Math.sin(theta)
+  );
+}
+
+// ── Hub markers (unchanged) ─────────────────────────────────────────
+// ── Gideon Node Markers — Hexagon Sprites ──────────────────────────
+// Three node types + one fwd op type, all rendered as canvas sprites.
+// nodeType: 'hq' = HQ Fusion (filled hex + gold ring)
+//           'fwd' = Forward Node (outline hex, green)
+//           'allied' = Allied Sovereign (outline hex, blue)
+// fwdOp: CARTOGRAPHER forward collection point (◉ circle-crosshair)
+
+const NODE_DEFS = [
+  { lat:38.9,  lon:-77.1,  nodeType:'hq',     tag:'US', label:'ARLINGTON'   },
+  { lat:30.3,  lon:-97.7,  nodeType:'fwd',    tag:'US', label:'AUSTIN'      },
+  { lat:38.8,  lon:-104.8, nodeType:'fwd',    tag:'US', label:'COL SPRINGS' },
+  { lat:51.5,  lon:-0.1,   nodeType:'allied', tag:'GB', label:'LONDON'      },
+  { lat:24.7,  lon:46.7,   nodeType:'allied', tag:'SA', label:'RIYADH'      },
+];
+
+const FWDOP_DEFS = [
+  { lat:50.4,  lon:30.5,   tag:'UA', label:'KYIV'     },
+  { lat:32.0,  lon:34.8,   tag:'IL', label:'TEL AVIV' },
+  { lat:-1.7,  lon:29.2,   tag:'CD', label:'GOMA'     },
+  { lat:37.6,  lon:127.0,  tag:'KR', label:'SEOUL'    },
+  { lat:52.2,  lon:21.0,   tag:'PL', label:'WARSAW'   },
+];
+
+// Draw a hexagon on a canvas (flat-top orientation)
+function makeNodeSprite(nodeType, label, tag) {
+  const S = 256;
+  const cv = document.createElement('canvas');
+  cv.width = S; cv.height = S;
+  const ctx = cv.getContext('2d');
+  ctx.clearRect(0, 0, S, S);
+
+  const cx = S / 2, cy = S / 2;
+  const R = 52; // larger hex radius
+
+  function hexPath(radius) {
+    ctx.beginPath();
+    for (let i = 0; i < 6; i++) {
+      const a = (Math.PI / 180) * (60 * i);
+      const x = cx + radius * Math.cos(a);
+      const y = cy + radius * Math.sin(a);
+      i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+    }
+    ctx.closePath();
+  }
+
+  if (nodeType === 'hq') {
+    // Semi-transparent fill + thick bright stroke
+    hexPath(R);
+    ctx.fillStyle = '#1a4a1acc';
+    ctx.fill();
+    ctx.strokeStyle = '#4cdd30';
+    ctx.lineWidth = 4.5;
+    ctx.stroke();
+    // Gold inner ring
+    ctx.beginPath();
+    ctx.arc(cx, cy, R * 0.42, 0, Math.PI * 2);
+    ctx.strokeStyle = '#ffdd00';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+    // Center dot
+    ctx.beginPath();
+    ctx.arc(cx, cy, 5, 0, Math.PI * 2);
+    ctx.fillStyle = '#4cdd30';
+    ctx.fill();
+  } else if (nodeType === 'fwd') {
+    hexPath(R);
+    ctx.fillStyle = '#0f2a0f88';
+    ctx.fill();
+    ctx.strokeStyle = '#4cdd30';
+    ctx.lineWidth = 3.5;
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.arc(cx, cy, 5, 0, Math.PI * 2);
+    ctx.fillStyle = '#4cdd30';
+    ctx.fill();
+  } else if (nodeType === 'allied') {
+    hexPath(R);
+    ctx.fillStyle = '#0a1e2a88';
+    ctx.fill();
+    ctx.strokeStyle = '#66eeff';
+    ctx.lineWidth = 4;
+    ctx.stroke();
+    // Glow inner fill
+    ctx.beginPath();
+    ctx.arc(cx, cy, R*0.35, 0, Math.PI*2);
+    ctx.fillStyle = '#30aadd22';
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(cx, cy, 6, 0, Math.PI * 2);
+    ctx.fillStyle = '#66eeff';
+    ctx.fill();
+  }
+
+  const col = nodeType === 'allied' ? '#66eeff' : '#4cdd30';
+  ctx.font = 'bold 15px monospace';
+  ctx.fillStyle = col;
+  ctx.textAlign = 'center';
+  ctx.fillText(tag, cx, cy - R - 6);
+  ctx.font = '12px monospace';
+  ctx.fillStyle = col + 'cc';
+  ctx.fillText(label, cx, cy + R + 16);
+
+  const tex = new THREE.CanvasTexture(cv);
+  tex.needsUpdate = true;
+  const mat = new THREE.SpriteMaterial({ map: tex, transparent: true, depthWrite: false, depthTest: false });
+  const sprite = new THREE.Sprite(mat);
+  sprite.scale.set(0.28, 0.28, 1);
+  scene.add(sprite);
+  return sprite;
+}
+
+// CARTOGRAPHER fwd op sprite: ◉ circle-crosshair
+function makeFwdOpSprite(label, tag) {
+  const S = 256;
+  const cv = document.createElement('canvas');
+  cv.width = S; cv.height = S;
+  const ctx = cv.getContext('2d');
+  ctx.clearRect(0, 0, S, S);
+
+  const cx = S / 2, cy = S / 2, r = 46;
+
+  // Outer glow ring
+  ctx.beginPath();
+  ctx.arc(cx, cy, r + 6, 0, Math.PI * 2);
+  ctx.strokeStyle = '#aaff4466';
+  ctx.lineWidth = 5;
+  ctx.stroke();
+  // Dark fill
+  ctx.beginPath();
+  ctx.arc(cx, cy, r, 0, Math.PI * 2);
+  ctx.fillStyle = '#0a200acc';
+  ctx.fill();
+  // Main circle
+  ctx.beginPath();
+  ctx.arc(cx, cy, r, 0, Math.PI * 2);
+  ctx.strokeStyle = '#aaff44';
+  ctx.lineWidth = 4;
+  ctx.stroke();
+  // Inner ring
+  ctx.beginPath();
+  ctx.arc(cx, cy, r * 0.5, 0, Math.PI * 2);
+  ctx.strokeStyle = '#aaff4466';
+  ctx.lineWidth = 1.5;
+  ctx.stroke();
+  // Center dot
+  ctx.beginPath();
+  ctx.arc(cx, cy, 8, 0, Math.PI * 2);
+  ctx.fillStyle = '#aaff44';
+  ctx.fill();
+  // Crosshair ticks — longer and bolder
+  const tLen = 14, gap = 11;
+  [[-1,0],[1,0],[0,-1],[0,1]].forEach(([dx,dy]) => {
+    ctx.beginPath();
+    ctx.moveTo(cx + dx*gap, cy + dy*gap);
+    ctx.lineTo(cx + dx*(gap+tLen), cy + dy*(gap+tLen));
+    ctx.strokeStyle = '#aaff44';
+    ctx.lineWidth = 3;
+    ctx.stroke();
+  });
+
+  ctx.font = 'bold 16px monospace';
+  ctx.fillStyle = '#aaff44';
+  ctx.textAlign = 'center';
+  ctx.fillText(tag, cx, cy - r - 8);
+  ctx.font = '13px monospace';
+  ctx.fillStyle = '#aaff44cc';
+  ctx.fillText(label, cx, cy + r + 18);
+
+  const tex = new THREE.CanvasTexture(cv);
+  tex.needsUpdate = true;
+  const mat = new THREE.SpriteMaterial({ map: tex, transparent: true, depthWrite: false, depthTest: false });
+  const sprite = new THREE.Sprite(mat);
+  sprite.scale.set(0.28, 0.28, 1);
+  scene.add(sprite);
+  return sprite;
+}
+
+// Build all node and fwd op objects
+const nodeObjs = NODE_DEFS.map(n => {
+  const sprite = makeNodeSprite(n.nodeType, n.label, n.tag);
+  return { ...n, sprite, base: ll3d(n.lat, n.lon, 1.255) };
+});
+
+const fwdOpObjs = FWDOP_DEFS.map(f => {
+  const sprite = makeFwdOpSprite(f.label, f.tag);
+  return { ...f, sprite, base: ll3d(f.lat, f.lon, 1.255) };
+});
+
+
+
+// ── MIL-STD-2525C Cyber Threat Symbols ─────────────────────────────
+// Standard: MIL-STD-2525C / NATO APP-6C
+// Hostile affiliation = RED DIAMOND frame (rotated square)
+// Suspect          = YELLOW DIAMOND frame (dashed)
+// Text modifiers: country tag above frame, threat class below
+// Engagement ring: pulsing circle around active hostile tracks
+//
+// Sources: CSIS, Microsoft Digital Defense 2025, IBM X-Force,
+// Oxford WCI, Embroker. Tiers: 0=HOSTILE/CRITICAL 1=INTRUSION/HIGH 2=PENDING/MEDIUM
+
+
+// ── Physical Conflict Detail Data ────────────────────────────────
+// Sources: ACLED 2024-25, SIPRI Yearbook 2025, UCDP, CFR, IISS,
+//   Crisis Group CrisisWatch, Statista Conflict Tracker
+// Conflict types: INTERSTATE_WAR, CIVIL_WAR, INSURGENCY,
+//   PROXY_CONFLICT, GANG_CARTEL, ATROCITY
+const CONFLICT_TYPE_CFG = {
+  INTERSTATE_WAR: { icon:'⚔', color:'#ff4422', label:'Interstate War'    },
+  CIVIL_WAR:      { icon:'⚡', color:'#ff7700', label:'Civil War'         },
+  INSURGENCY:     { icon:'◈', color:'#ffaa00', label:'Insurgency'        },
+  PROXY_CONFLICT: { icon:'⬡', color:'#cc44ff', label:'Proxy Conflict'    },
+  GANG_CARTEL:    { icon:'✦', color:'#ff44aa', label:'Gang / Cartel'     },
+  ATROCITY:       { icon:'▲', color:'#ff2266', label:'Atrocity / Repression'},
+};
+
+const CONFLICT_DETAIL = {
+  // ── Tier 0: MAJOR WAR ────────────────────────────────────────────
+  'UA': {
+    city:'KYIV, UKRAINE', tier:'MAJOR WAR', tierColor:'#ff8855',
+    type:'INTERSTATE_WAR',
+    parties:'Russia (RF Armed Forces) vs Ukraine (AFU)',
+    deaths:'323,000+ killed (Crawford Est. Jul 2025)',
+    status:'Active eastern front; Russia holds ~19% territory',
+    trend:'↑ Escalating — drone warfare surge 2025', trendClass:'cf-trend-up',
+    lastEvent:'Apr 2026', source:'SOURCE: CSIS · ISW · OHCHR · SIPRI 2025'
+  },
+  'PS': {
+    city:'GAZA / PALESTINE', tier:'MAJOR WAR', tierColor:'#ff8855',
+    type:'INTERSTATE_WAR',
+    parties:'Israel (IDF) vs Hamas · PIJ · Hezbollah',
+    deaths:'75,000+ Gaza; 3,000+ Lebanon',
+    status:'Gaza ceasefire collapsed Mar 2025; resumed Oct 2025',
+    trend:'↑ Resumed offensive operations', trendClass:'cf-trend-up',
+    lastEvent:'Apr 2026', source:'SOURCE: ACLED · UN OCHA · SIPRI'
+  },
+  'SD': {
+    city:'KHARTOUM, SUDAN', tier:'MAJOR WAR', tierColor:'#ff8855',
+    type:'CIVIL_WAR',
+    parties:'SAF (Sudan Armed Forces) vs RSF (Rapid Support Forces)',
+    deaths:'150,000+ killed; 14M displaced',
+    status:'RSF controls Darfur; SAF retook Khartoum Mar 2025',
+    trend:'↑ World\'s largest displacement crisis', trendClass:'cf-trend-up',
+    lastEvent:'Apr 2026', source:'SOURCE: SIPRI · STATISTA · CFR'
+  },
+  'MM': {
+    city:'NAYPYIDAW, MYANMAR', tier:'MAJOR WAR', tierColor:'#ff8855',
+    type:'CIVIL_WAR',
+    parties:'Tatmadaw (Junta) vs 1,200+ armed resistance groups',
+    deaths:'80,000+ killed since 2021 coup',
+    status:'Resistance controls ~50% of territory',
+    trend:'↑ Junta losing ground in 2025', trendClass:'cf-trend-up',
+    lastEvent:'Apr 2026', source:'SOURCE: ACLED · IISS · SIPRI 2025'
+  },
+  'ET': {
+    city:'ADDIS ABABA, ETHIOPIA', tier:'MAJOR WAR', tierColor:'#ff8855',
+    type:'INSURGENCY',
+    parties:'ENDF vs Amhara Fano militia + TPLF remnants',
+    deaths:'10,000+ in 2024; Tigray ceasefire fragile',
+    status:'Amhara conflict surging; northern front active',
+    trend:'↑ Amhara war expanding in scope', trendClass:'cf-trend-up',
+    lastEvent:'Mar 2026', source:'SOURCE: SIPRI 2025 · ACLED · CFR'
+  },
+  // ── Tier 1: HIGH INTENSITY ────────────────────────────────────────
+  'IL': {
+    city:'WEST BANK, ISRAEL', tier:'HIGH INTENSITY', tierColor:'#ffbb55',
+    type:'ATROCITY',
+    parties:'IDF vs Palestinian armed factions + settlers',
+    deaths:'1,000+ killed since Oct 2023',
+    status:'IDF raids ongoing; settler violence escalating',
+    trend:'↑ Raid frequency increased 2025', trendClass:'cf-trend-up',
+    lastEvent:'Apr 2026', source:'SOURCE: ACLED · UN OCHA · AMNESTY'
+  },
+  'IR': {
+    city:'TEHRAN, IRAN', tier:'HIGH INTENSITY', tierColor:'#ffbb55',
+    type:'INTERSTATE_WAR',
+    parties:'Iran (IRGC) vs Israel (IDF) + proxy networks',
+    deaths:'Hundreds — June 2025 12-day direct war',
+    status:'Fragile ceasefire; proxy conflicts ongoing in region',
+    trend:'↔ Ceasefire holding — proxy wars active', trendClass:'cf-trend-flat',
+    lastEvent:'Jun 2025', source:'SOURCE: CRISIS GROUP · IISS · CFR'
+  },
+  'YE': {
+    city:'SANAA, YEMEN', tier:'HIGH INTENSITY', tierColor:'#ffbb55',
+    type:'PROXY_CONFLICT',
+    parties:'Houthis (Iran-backed) vs Saudi-led coalition + STC',
+    deaths:'400,000+ total since 2014; 150,000+ combat deaths',
+    status:'Houthi Red Sea attacks resumed early 2026',
+    trend:'↑ Red Sea operations escalating', trendClass:'cf-trend-up',
+    lastEvent:'Apr 2026', source:'SOURCE: SIPRI · CFR · ACLED'
+  },
+  'SO': {
+    city:'MOGADISHU, SOMALIA', tier:'HIGH INTENSITY', tierColor:'#ffbb55',
+    type:'INSURGENCY',
+    parties:'Somali gov + AU forces vs Al-Shabaab',
+    deaths:'5,000–7,000 per year',
+    status:'Al-Shabaab controls ~20% of territory',
+    trend:'↔ Stalemate persists since 2023', trendClass:'cf-trend-flat',
+    lastEvent:'Apr 2026', source:'SOURCE: ACLED · CFR · SIPRI'
+  },
+  'NG': {
+    city:'ABUJA, NIGERIA', tier:'HIGH INTENSITY', tierColor:'#ffbb55',
+    type:'INSURGENCY',
+    parties:'Nigeria military vs Boko Haram · IS-WAP · bandits',
+    deaths:'10,000+ per year; multiplex regional conflict',
+    status:'Lake Chad basin — Borno and Zamfara fronts active',
+    trend:'↑ Bandit violence expanding southward', trendClass:'cf-trend-up',
+    lastEvent:'Mar 2026', source:'SOURCE: ACLED · IISS · CFR'
+  },
+  'CD': {
+    city:'GOMA, DRC', tier:'HIGH INTENSITY', tierColor:'#ffbb55',
+    type:'PROXY_CONFLICT',
+    parties:'FARDC vs M23 (Rwanda-backed) + 200+ armed groups',
+    deaths:'7,000+ in Jan–Feb 2025 alone',
+    status:'M23 took Goma and Bukavu Jan 2025; ongoing',
+    trend:'↑ Worst escalation since 2012', trendClass:'cf-trend-up',
+    lastEvent:'Apr 2026', source:'SOURCE: STATISTA · CFR · SIPRI'
+  },
+  'PK': {
+    city:'ISLAMABAD, PAKISTAN', tier:'HIGH INTENSITY', tierColor:'#ffbb55',
+    type:'INSURGENCY',
+    parties:'Pakistan military vs TTP + Baloch Liberation Army',
+    deaths:'2,000+ per year; cross-border AfPak dimension',
+    status:'TTP attacks surging; India border tensions elevated',
+    trend:'↑ TTP attacks up 70% since 2022', trendClass:'cf-trend-up',
+    lastEvent:'Mar 2026', source:'SOURCE: ACLED · CRISIS GROUP · CFR'
+  },
+  'ML': {
+    city:'BAMAKO, MALI', tier:'HIGH INTENSITY', tierColor:'#ffbb55',
+    type:'INSURGENCY',
+    parties:'Malian junta + Wagner Group vs JNIM + IS-Sahel',
+    deaths:'5,000+ per year; entire Sahel arc affected',
+    status:'JNIM dominant in north and center; IS expanding east',
+    trend:'↑ JNIM seized Timbuktu area 2025', trendClass:'cf-trend-up',
+    lastEvent:'Mar 2026', source:'SOURCE: ACLED · CFR · SIPRI'
+  },
+  'BF': {
+    city:'OUAGADOUGOU, BURKINA FASO', tier:'HIGH INTENSITY', tierColor:'#ffbb55',
+    type:'INSURGENCY',
+    parties:'Burkina junta + VDPs vs JNIM + IS-Sahel',
+    deaths:'5,000+ per year; 14% population exposed',
+    status:'IS-Sahel expanding into previously stable zones',
+    trend:'↑ Deadliest Sahel state per capita 2025', trendClass:'cf-trend-up',
+    lastEvent:'Mar 2026', source:'SOURCE: ACLED · STATISTA · CFR'
+  },
+  'MX': {
+    city:'MEXICO CITY, MEXICO', tier:'HIGH INTENSITY', tierColor:'#ffbb55',
+    type:'GANG_CARTEL',
+    parties:'Cartel Jalisco + Sinaloa + 8 major cartels vs state',
+    deaths:'30,000+ per year (all homicide); ACLED top-10',
+    status:'18% lethality rate increase 2024; Sinaloa split',
+    trend:'↑ Cartel fragmentation driving violence spike', trendClass:'cf-trend-up',
+    lastEvent:'Apr 2026', source:'SOURCE: ACLED · CFR · INEGI'
+  },
+  'HT': {
+    city:'PORT-AU-PRINCE, HAITI', tier:'HIGH INTENSITY', tierColor:'#ffbb55',
+    type:'GANG_CARTEL',
+    parties:'Gang coalitions (Viv Ansanm) vs police + population',
+    deaths:'4,500+ killed 2025; near-doubling of prior year',
+    status:'Gangs control ~85% of capital; MPC deployed',
+    trend:'↑ State collapse accelerating', trendClass:'cf-trend-up',
+    lastEvent:'Apr 2026', source:'SOURCE: ACLED · UN · CFR'
+  },
+  // ── Tier 2: ACTIVE (sub-threshold — popups still available) ────────
+  'AF': {
+    city:'KABUL, AFGHANISTAN', tier:'ACTIVE', tierColor:'#dd3399',
+    type:'INSURGENCY',
+    parties:'Taliban (state) vs IS-Khorasan + Pakistan cross-border',
+    deaths:'<1,000/yr combat; sporadic IS-K attacks',
+    status:'Taliban consolidating; IS-K attacks continue',
+    trend:'↔ Low intensity but persistent', trendClass:'cf-trend-flat',
+    lastEvent:'Mar 2026', source:'SOURCE: CRISIS GROUP · CFR · ACLED'
+  },
+  'SY': {
+    city:'DAMASCUS, SYRIA', tier:'ACTIVE', tierColor:'#dd3399',
+    type:'CIVIL_WAR',
+    parties:'HTS (post-Assad) vs IS remnants + Turkish-backed factions',
+    deaths:'<1,000/yr; IS resurgence in desert',
+    status:'HTS governing; IS cells active in Deir ez-Zor',
+    trend:'↑ IS-Syria resurgence noted Q1 2026', trendClass:'cf-trend-up',
+    lastEvent:'Mar 2026', source:'SOURCE: ACLED · CRISIS GROUP'
+  },
+  'BR': {
+    city:'SÃO PAULO, BRAZIL', tier:'ACTIVE', tierColor:'#dd3399',
+    type:'GANG_CARTEL',
+    parties:'PCC + Comando Vermelho vs police + rival factions',
+    deaths:'Political violence; ACLED top-10 by event count',
+    status:'Gang territorial control in favelas; political targeting',
+    trend:'↑ Election-related violence surge 2024', trendClass:'cf-trend-up',
+    lastEvent:'Feb 2026', source:'SOURCE: ACLED · CFR'
+  },
+  'EC': {
+    city:'GUAYAQUIL, ECUADOR', tier:'ACTIVE', tierColor:'#dd3399',
+    type:'GANG_CARTEL',
+    parties:'Los Choneros + Albanian mafia + 20+ gangs vs state',
+    deaths:'1,000+ more than 2024; record homicide rate',
+    status:'State of emergency declared; military deployed',
+    trend:'↑ Narco violence record levels 2025', trendClass:'cf-trend-up',
+    lastEvent:'Mar 2026', source:'SOURCE: ACLED · CFR · INSIGHT CRIME'
+  },
+  'SS': {
+    city:'JUBA, SOUTH SUDAN', tier:'ACTIVE', tierColor:'#dd3399',
+    type:'CIVIL_WAR',
+    parties:'SPLM-IG vs SPLM-IO + intercommunal militia',
+    deaths:'139 killed in single Mar 2026 massacre',
+    status:'Peace deal fragile; intercommunal violence resurgent',
+    trend:'↑ Violence spike Mar 2026', trendClass:'cf-trend-up',
+    lastEvent:'Mar 2026', source:'SOURCE: CFR · CRISIS GROUP · ACLED'
+  },
+  'LY': {
+    city:'TRIPOLI, LIBYA', tier:'ACTIVE', tierColor:'#dd3399',
+    type:'CIVIL_WAR',
+    parties:'GNU (west) vs LNA Haftar (east) + foreign proxies',
+    deaths:'Low-level clashes; Russian/Turkish proxy involvement',
+    status:'De facto partition continues; oil as flashpoint',
+    trend:'↔ Frozen conflict with periodic escalation', trendClass:'cf-trend-flat',
+    lastEvent:'Feb 2026', source:'SOURCE: CFR · CRISIS GROUP'
+  },
+  'TD': {
+    city:"N'DJAMENA, CHAD", tier:'ACTIVE', tierColor:'#dd3399',
+    type:'INSURGENCY',
+    parties:'Chadian junta vs Sahel spillover groups + rebel factions',
+    deaths:'Coup-belt instability; Sudanese RSF cross-border',
+    status:'Post-coup consolidation; northern border volatile',
+    trend:'↔ RSF cross-border threat elevated', trendClass:'cf-trend-flat',
+    lastEvent:'Jan 2026', source:'SOURCE: ACLED · CFR'
+  },
+  'CM': {
+    city:"YAOUNDÉ, CAMEROON", tier:'ACTIVE', tierColor:'#dd3399',
+    type:'INSURGENCY',
+    parties:'Cameroon military vs Ambazonia separatists (SOCADEF)',
+    deaths:'<500/yr; ghost towns in NW/SW regions',
+    status:'Anglophone regions under military administration',
+    trend:'↔ Low intensity; no political resolution', trendClass:'cf-trend-flat',
+    lastEvent:'Feb 2026', source:'SOURCE: ACLED · CFR 2026 · CRISIS GROUP'
+  },
+  'MZ': {
+    city:'MAPUTO, MOZAMBIQUE', tier:'ACTIVE', tierColor:'#dd3399',
+    type:'INSURGENCY',
+    parties:'Mozambique military + SADC vs Ansar al-Sunna (IS-linked)',
+    deaths:'<500/yr; election violence added layer',
+    status:'IS-Mozambique active in Cabo Delgado; Frelimo election dispute',
+    trend:'↑ Post-election violence added to IS insurgency', trendClass:'cf-trend-up',
+    lastEvent:'Mar 2026', source:'SOURCE: ACLED · STATISTA · CFR'
+  },
+  'CO': {
+    city:'BOGOTÁ, COLOMBIA', tier:'ACTIVE', tierColor:'#dd3399',
+    type:'INSURGENCY',
+    parties:'ELN + FARC dissidents + Gulf Clan vs Colombian state',
+    deaths:'<500/yr combat; peace talks ongoing',
+    status:'ELN talks broken down; FARC dissidents expanding',
+    trend:'↑ Resurgence during stalled peace talks', trendClass:'cf-trend-up',
+    lastEvent:'Mar 2026', source:'SOURCE: ACLED · CRISIS GROUP · CFR'
+  },
+  'NE': {
+    city:'NIAMEY, NIGER', tier:'ACTIVE', tierColor:'#dd3399',
+    type:'INSURGENCY',
+    parties:'Niger junta vs IS-Sahel + JNIM spillover',
+    deaths:'<500/yr; post-coup ECOWAS pressure removed',
+    status:'IS-Sahel expanding; French forces expelled',
+    trend:'↑ Security vacuum post-coup accelerating IS', trendClass:'cf-trend-up',
+    lastEvent:'Mar 2026', source:'SOURCE: ACLED · CFR · STATISTA'
+  },
+};
+
+// Tag lookup for conflict zones: maps THREAT_ZONES entry to CONFLICT_DETAIL key
+// Some zones share tag with cyber (UA, IL, IR) — use a zone-specific conflictTag field
+// Already handled by zone.tag in THREAT_ZONES
+
+// ══════════════════════════════════════════════════════════════════
+// UNIFIED THREAT ZONES — composite diamond|triangle per location
+// Each zone carries both a cyber tier (c) and a conflict tier (f).
+// -1 = not present for that domain.
+// Cyber:    0=HOSTILE 1=INTRUSION 2=PENDING
+// Conflict: 0=MAJOR WAR 1=HIGH 2=ACTIVE
+// Sources: ACLED/SIPRI/UCDP 2024-25, CSIS, Microsoft DDR 2025
+// ══════════════════════════════════════════════════════════════════
+
+// ── Cyber Threat Detail Data (sourced: CSIS, Microsoft DDR 2025,
+//    IBM X-Force, ACLED, Oxford WCI, NCSC, Embroker) ─────────────
+const CYBER_DETAIL = {
+  'US': {
+    city:'WASHINGTON DC', tier:'HOSTILE', tierColor:'#ff5533',
+    incidents:'86% of N. American incidents',
+    actor:'China Volt Typhoon · Russia SVR',
+    vectors:'Telecom · Supply chain · Espionage',
+    targets:'Federal gov · Telecom · Healthcare',
+    trend:'↑ Salt Typhoon breach 2024', trendClass:'cp-trend-up',
+    lastEvent:'Dec 2024', source:'SOURCE: CSIS · MICROSOFT DDR 2025'
+  },
+  'UA': {
+    city:'KYIV', tier:'HOSTILE', tierColor:'#ff5533',
+    incidents:'4,315 confirmed in 2024',
+    actor:'Russian GRU / Sandworm APT',
+    vectors:'Malware · Phishing · Wiper attacks',
+    targets:'Critical infra · Energy · Defense',
+    trend:'↑ 70% YoY surge', trendClass:'cp-trend-up',
+    lastEvent:'Jan 2025', source:'SOURCE: CSIS · ACLED · ENISA'
+  },
+  'TW': {
+    city:'TAIPEI', tier:'HOSTILE', tierColor:'#ff5533',
+    incidents:'2.4M daily attempts in 2024',
+    actor:'PLA Unit 61398 · APT41',
+    vectors:'DDoS · Espionage · APT intrusion',
+    targets:'Government systems · Telecom',
+    trend:'↑ Doubled YoY', trendClass:'cp-trend-up',
+    lastEvent:'Jan 2025', source:'SOURCE: TAIWAN NSB · CSIS'
+  },
+  'IL': {
+    city:'ISRAEL / PALESTINE', tier:'HOSTILE', tierColor:'#ff5533',
+    incidents:'1,550+ confirmed in 2024',
+    actor:'Iranian IRGC · Hamas affiliates',
+    vectors:'DDoS · Wiper malware · Disinfo ops',
+    targets:'Defense · Energy · Finance',
+    trend:'↑ War-driven surge', trendClass:'cp-trend-up',
+    lastEvent:'Apr 2025', source:'SOURCE: NCSC · CSIS · MICROSOFT'
+  },
+  'RU': {
+    city:'MOSCOW', tier:'HOSTILE', tierColor:'#ff5533',
+    incidents:'288 political cyberattacks originated',
+    actor:'Russian state + criminal groups',
+    vectors:'Ransomware · APT · Botnet ops',
+    targets:'Global; also targeted by Western ops',
+    trend:'↔ Consistent high activity', trendClass:'cp-trend-flat',
+    lastEvent:'Apr 2025', source:'SOURCE: OXFORD WCI · STATISTA'
+  },
+  'IR': {
+    city:'TEHRAN', tier:'INTRUSION', tierColor:'#ffbb33',
+    incidents:'Active state + retaliatory ops',
+    actor:'Israeli Unit 8200 · USCYBERCOM',
+    vectors:'SCADA attacks · ICS compromise',
+    targets:'Nuclear facilities · Energy · Gov',
+    trend:'↑ Escalated post-June 2025 war', trendClass:'cp-trend-up',
+    lastEvent:'Apr 2025', source:'SOURCE: CSIS · ICS-CERT · IISS'
+  },
+  'PL': {
+    city:'WARSAW', tier:'INTRUSION', tierColor:'#ffbb33',
+    incidents:'1,000+ attacks per week in 2024',
+    actor:'Russian GRU / Fancy Bear',
+    vectors:'DDoS · Phishing · Infrastructure',
+    targets:'Government · Transport · Energy',
+    trend:'↑ Highest EU volume 2024', trendClass:'cp-trend-up',
+    lastEvent:'Jan 2025', source:'SOURCE: EMBROKER · CSIS · BSI'
+  },
+  'AE': {
+    city:'DUBAI', tier:'INTRUSION', tierColor:'#ffbb33',
+    incidents:'Top-3 Iranian target (Microsoft)',
+    actor:'Iranian APT34 / OilRig',
+    vectors:'Spear-phishing · Finance fraud',
+    targets:'Finance · Crypto · Shipping',
+    trend:'↑ $1.5B ByBit theft Feb 2025', trendClass:'cp-trend-up',
+    lastEvent:'Feb 2025', source:'SOURCE: MICROSOFT DDR · PALO ALTO'
+  },
+  'IN': {
+    city:'NEW DELHI', tier:'INTRUSION', tierColor:'#ffbb33',
+    incidents:'204,844 gov incidents in 2023',
+    actor:'Chinese APT · Pakistani actors',
+    vectors:'Phishing · Espionage · RAT deploy',
+    targets:'Gov · Defense · Research orgs',
+    trend:'↑ 138% rise since 2019', trendClass:'cp-trend-up',
+    lastEvent:'Dec 2024', source:'SOURCE: INDIA MEITY · CSIS'
+  },
+  'KR': {
+    city:'SEOUL', tier:'INTRUSION', tierColor:'#ffbb33',
+    incidents:'Thousands of machines compromised',
+    actor:'North Korean Lazarus Group',
+    vectors:'PowerShell · Dropbox C2 · Crypto',
+    targets:'Finance · Defense · Government',
+    trend:'↑ Feb 2025 espionage campaign', trendClass:'cp-trend-up',
+    lastEvent:'Feb 2025', source:'SOURCE: CSIS · ENISA · KISA'
+  },
+  'GB': {
+    city:'LONDON', tier:'INTRUSION', tierColor:'#ffbb33',
+    incidents:'430 NCSC-assisted attacks 2024',
+    actor:'Russia · China · Iran · DPRK',
+    vectors:'Espionage · Ransomware · DDoS',
+    targets:'Government · Finance · Healthcare',
+    trend:'↑ 3× vs prior year (NCSC)', trendClass:'cp-trend-up',
+    lastEvent:'Apr 2025', source:'SOURCE: NCSC 2024 · CSIS'
+  },
+  'DE': {
+    city:'BERLIN', tier:'INTRUSION', tierColor:'#ffbb33',
+    incidents:'Top EU incident count',
+    actor:'Russian APT28 / Fancy Bear',
+    vectors:'Infrastructure attacks · ATC hack',
+    targets:'Government · Transport · Military',
+    trend:'↑ Air traffic control attack 2024', trendClass:'cp-trend-up',
+    lastEvent:'Jan 2025', source:'SOURCE: KONBRIEFING · BSI'
+  },
+  'CN': {
+    city:'BEIJING', tier:'INTRUSION', tierColor:'#ffbb33',
+    incidents:'1,300+ foreign APT attacks 2024',
+    actor:'US NSA · Five Eyes (alleged)',
+    vectors:'Espionage · Trade secret theft',
+    targets:'Tech · AI · Defense R&D sectors',
+    trend:'↑ 300% financial sector rise', trendClass:'cp-trend-up',
+    lastEvent:'Jan 2025', source:'SOURCE: CHINESE NCSC · CSIS'
+  },
+  'SA': {
+    city:'RIYADH', tier:'PENDING', tierColor:'#bb88ff',
+    incidents:'Energy sector targeting active',
+    actor:'Iranian APT · Destructive ops',
+    vectors:'SCADA · ICS · Wiper malware',
+    targets:'Energy infrastructure · Oil/Gas',
+    trend:'↔ Under continuous monitoring', trendClass:'cp-trend-flat',
+    lastEvent:'Dec 2024', source:'SOURCE: CSIS · ICS-CERT'
+  },
+  'KP': {
+    city:'PYONGYANG', tier:'PENDING', tierColor:'#bb88ff',
+    incidents:'Origin of $1.5B ETH theft 2025',
+    actor:'Lazarus Group (DPRK state)',
+    vectors:'Crypto exchange hack · Finance',
+    targets:'Cryptocurrency exchanges globally',
+    trend:'↑ Record crypto theft Feb 2025', trendClass:'cp-trend-up',
+    lastEvent:'Feb 2025', source:'SOURCE: CSIS · FBI · CHAINALYSIS'
+  },
+  'RO': {
+    city:'BUCHAREST', tier:'PENDING', tierColor:'#bb88ff',
+    incidents:'85,000 election system attacks',
+    actor:'Russian GRU (attributed)',
+    vectors:'Election interference · Phishing',
+    targets:'Election systems · Government',
+    trend:'↑ Pre-election spike Dec 2024', trendClass:'cp-trend-up',
+    lastEvent:'Dec 2024', source:'SOURCE: CSIS · ENISA · DIICOT'
+  },
+};
+
+const THREAT_ZONES = [
+  // ── Both cyber + physical ──────────────────────────────────────
+  { lat:50.4,  lon:30.5,  c:0, f:0, tag:'UA', label:'KYIV'        }, // cyber HOSTILE + MAJOR WAR
+  { lat:31.5,  lon:34.5,  c:0, f:0, tag:'IL', label:'ISRAEL-PS'   }, // cyber HOSTILE + MAJOR WAR
+  { lat:38.9,  lon:-77.0, c:0, f:-1,tag:'US', label:'WASHINGTON'  }, // cyber HOSTILE only
+  { lat:25.0,  lon:121.5, c:0, f:-1,tag:'TW', label:'TAIPEI'      }, // cyber HOSTILE only (PLA threat is military posture, no active conflict)
+  { lat:55.7,  lon:37.6,  c:0, f:-1,tag:'RU', label:'MOSCOW'      }, // cyber HOSTILE origin
+  { lat:35.7,  lon:51.4,  c:1, f:1, tag:'IR', label:'TEHRAN'      }, // cyber INTRUSION + HIGH conflict
+  { lat:52.2,  lon:21.0,  c:1, f:-1,tag:'PL', label:'WARSAW'      }, // cyber INTRUSION only
+  { lat:25.2,  lon:55.3,  c:1, f:-1,tag:'AE', label:'DUBAI'       }, // cyber INTRUSION only
+  { lat:28.6,  lon:77.2,  c:1, f:-1,tag:'IN', label:'NEW DELHI'   }, // cyber INTRUSION only
+  { lat:37.6,  lon:127.0, c:1, f:-1,tag:'KR', label:'SEOUL'       }, // cyber INTRUSION only
+  { lat:51.5,  lon:-0.1,  c:1, f:-1,tag:'GB', label:'LONDON'      }, // cyber INTRUSION only
+  { lat:52.5,  lon:13.4,  c:1, f:-1,tag:'DE', label:'BERLIN'      }, // cyber INTRUSION only
+  { lat:39.9,  lon:116.4, c:1, f:-1,tag:'CN', label:'BEIJING'     }, // cyber INTRUSION only
+  { lat:24.7,  lon:46.7,  c:2, f:-1,tag:'SA', label:'RIYADH'      }, // cyber PENDING only
+  { lat:39.0,  lon:125.7, c:2, f:-1,tag:'KP', label:'PYONGYANG'   }, // cyber PENDING only
+  { lat:44.4,  lon:26.1,  c:2, f:-1,tag:'RO', label:'BUCHAREST'   }, // cyber PENDING only
+  // ── Physical conflict only ─────────────────────────────────────
+  { lat:15.5,  lon:32.5,  c:-1,f:0, tag:'SD', label:'SUDAN'       }, // MAJOR WAR
+  { lat:19.7,  lon:96.1,  c:-1,f:0, tag:'MM', label:'MYANMAR'     }, // MAJOR WAR
+  { lat:9.0,   lon:38.7,  c:-1,f:0, tag:'ET', label:'ETHIOPIA'    }, // MAJOR WAR
+  { lat:15.4,  lon:44.2,  c:-1,f:1, tag:'YE', label:'YEMEN'       }, // HIGH conflict
+  { lat:2.0,   lon:45.3,  c:-1,f:1, tag:'SO', label:'SOMALIA'     }, // HIGH conflict
+  { lat:9.1,   lon:7.2,   c:-1,f:1, tag:'NG', label:'NIGERIA'     }, // HIGH conflict
+  { lat:-1.7,  lon:29.2,  c:-1,f:1, tag:'CD', label:'DRC'         }, // HIGH conflict
+  { lat:33.7,  lon:73.1,  c:-1,f:1, tag:'PK', label:'PAKISTAN'    }, // HIGH conflict
+  { lat:12.6,  lon:-8.0,  c:-1,f:1, tag:'ML', label:'MALI'        }, // HIGH conflict
+  { lat:12.4,  lon:-1.5,  c:-1,f:1, tag:'BF', label:'BURKINA'     }, // HIGH conflict
+  { lat:19.4,  lon:-99.1, c:-1,f:1, tag:'MX', label:'MEXICO'      }, // HIGH conflict
+  { lat:18.5,  lon:-72.3, c:-1,f:1, tag:'HT', label:'HAITI'       }, // HIGH conflict
+  // ── Tier 2 ACTIVE conflicts (no label) ───────────────────────
+  { lat:34.5,  lon:69.2,  c:-1,f:2, tag:'AF',  label:'KABUL'       }, // Afghanistan
+  { lat:33.5,  lon:36.3,  c:-1,f:2, tag:'SY',  label:'DAMASCUS'    }, // Syria
+  { lat:-23.5, lon:-46.6, c:-1,f:2, tag:'BR',  label:'SAO PAULO'   }, // Brazil
+  { lat:-2.2,  lon:-79.9, c:-1,f:2, tag:'EC',  label:'GUAYAQUIL'   }, // Ecuador
+  { lat:4.9,   lon:31.6,  c:-1,f:2, tag:'SS',  label:'JUBA'        }, // South Sudan
+  { lat:32.9,  lon:13.2,  c:-1,f:2, tag:'LY',  label:'TRIPOLI'     }, // Libya
+  { lat:12.1,  lon:15.0,  c:-1,f:2, tag:'TD',  label:'NDJAMENA'    }, // Chad
+  { lat:3.9,   lon:11.5,  c:-1,f:2, tag:'CM',  label:'YAOUNDE'     }, // Cameroon
+  { lat:-25.9, lon:32.6,  c:-1,f:2, tag:'MZ',  label:'MAPUTO'      }, // Mozambique
+  { lat:4.7,   lon:-74.1, c:-1,f:2, tag:'CO',  label:'BOGOTA'      }, // Colombia
+  { lat:13.5,  lon:2.1,   c:-1,f:2, tag:'NE',  label:'NIAMEY'      }, // Niger
+];
+
+
+// ── Visual configs ─────────────────────────────────────────────────
+// Cyber tiers: 0=HOSTILE 1=INTRUSION 2=PENDING
+const C_CFG = [
+  { fill:'#cc0000cc', stroke:'#ff5555', text:'#ff9977', lw:2.5, label:'HOSTILE' },
+  { fill:'#bb6600cc', stroke:'#ffbb33', text:'#ffdd77', lw:2.2, label:'INTRUSION' },
+  { fill:'#553388cc', stroke:'#aa77ff', text:'#cc99ff', lw:1.8, label:'PENDING' },
+];
+// Conflict tiers: 0=MAJOR WAR 1=HIGH 2=ACTIVE
+const F_CFG = [
+  { fill:'#dd4400cc', stroke:'#ff8855', text:'#ffcc99', lw:2.5, label:'MAJOR WAR' },
+  { fill:'#cc7700cc', stroke:'#ffbb55', text:'#ffdd99', lw:2.2, label:'HIGH' },
+  { fill:'#881144cc', stroke:'#dd3399', text:'#ff77cc', lw:1.8, label:'ACTIVE' },
+];
+
+// ── Composite sprite builder ────────────────────────────────────────
+// Layout on a 256x256 canvas:
+//   Dual: diamond LEFT half | triangle RIGHT half, side by side
+//   Cyber only: diamond centered
+//   Conflict only: triangle centered
+function makeCompositeSprite(zone) {
+  const S = 256, cx = S/2, cy = S/2;
+  const hasCyber    = zone.c >= 0;
+  const hasConflict = zone.f >= 0;
+  const isDual      = hasCyber && hasConflict;
+
+  const cv = document.createElement('canvas');
+  cv.width = S; cv.height = S;
+  const ctx = cv.getContext('2d');
+  ctx.clearRect(0, 0, S, S);
+
+  // Diamond params
+  const D  = 38;           // diamond half-diagonal (single domain)
+  const DD = isDual ? 46 : D; // dual diamond slightly larger to frame the triangle
+  // Triangle params (for single-domain only)
+  const TH = 38;
+  const TW = TH * 0.866;
+
+  if (isDual) {
+    // ── Option 2: Diamond frames a centered black triangle ──────────
+    const cc = C_CFG[zone.c];
+
+    // Draw diamond centered
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.rotate(Math.PI / 4);
+    ctx.beginPath();
+    ctx.rect(-DD, -DD, DD*2, DD*2);
+    ctx.fillStyle = cc.fill;
+    ctx.fill();
+    ctx.strokeStyle = cc.stroke;
+    ctx.lineWidth = cc.lw * 1.6;
+    ctx.stroke();
+    ctx.restore();
+
+    // Draw black triangle centered inside diamond — larger than before
+    // Triangle sized to fit visibly inside the diamond with clear contrast
+    const triH = DD * 0.85;   // triangle height
+    const triW = triH * 0.866; // equilateral
+    ctx.beginPath();
+    ctx.moveTo(cx,         cy - triH * 0.65); // apex
+    ctx.lineTo(cx + triW,  cy + triH * 0.35); // bottom right
+    ctx.lineTo(cx - triW,  cy + triH * 0.35); // bottom left
+    ctx.closePath();
+    ctx.fillStyle = '#000000';
+    ctx.fill();
+    // Bright conflict-tier stroke on triangle so it reads clearly
+    const fc = F_CFG[zone.f];
+    ctx.strokeStyle = fc.stroke;
+    ctx.lineWidth = 2.2;
+    ctx.stroke();
+
+  } else {
+    // ── Single domain: original rendering ───────────────────────────
+
+    const diamondX  = cx;
+    const triangleX = cx;
+
+    // ─ Draw cyber diamond ─
+    if (hasCyber) {
+      const cc = C_CFG[zone.c];
+      ctx.save();
+      ctx.translate(diamondX, cy);
+      ctx.rotate(Math.PI / 4);
+      ctx.beginPath();
+      ctx.rect(-D, -D, D*2, D*2);
+      ctx.fillStyle = cc.fill;
+      ctx.fill();
+      ctx.strokeStyle = cc.stroke;
+      ctx.lineWidth = cc.lw * 1.4;
+      ctx.setLineDash([]);
+      ctx.stroke();
+      ctx.restore();
+
+      // Lightning bolt inside diamond
+      ctx.save();
+      ctx.translate(diamondX, cy);
+      ctx.fillStyle = cc.stroke;
+      ctx.beginPath();
+      ctx.moveTo(3, -10); ctx.lineTo(-3, 0);
+      ctx.lineTo(3, 0);   ctx.lineTo(-3, 10);
+      ctx.lineTo(3, 2);   ctx.lineTo(-2, 2);
+      ctx.closePath();
+      ctx.fill();
+      ctx.restore();
+    }
+
+    // ─ Draw conflict triangle ─
+    if (hasConflict) {
+      const fc = F_CFG[zone.f];
+      const tx = [triangleX, triangleX + TW, triangleX - TW];
+      const ty = [cy - TH, cy + TH*0.5, cy + TH*0.5];
+      ctx.beginPath();
+      ctx.moveTo(tx[0], ty[0]);
+      ctx.lineTo(tx[1], ty[1]);
+      ctx.lineTo(tx[2], ty[2]);
+      ctx.closePath();
+      ctx.fillStyle = fc.fill;
+      ctx.fill();
+      ctx.strokeStyle = fc.stroke;
+      ctx.lineWidth = fc.lw * 2.8;
+      ctx.stroke();
+    }
+  }
+
+  // ─ Text labels ─
+  const labelTH = 38; // for label positioning
+  const showLabel = (zone.c === 0 || zone.f === 0) && zone.tag;
+  if (showLabel) {
+    ctx.textAlign = 'center';
+    ctx.font = 'bold 13px monospace';
+    const labelColor = isDual ? C_CFG[0].text : (zone.c === 0 ? C_CFG[0].text : F_CFG[0].text);
+    ctx.fillStyle = labelColor;
+    const yOff = isDual ? (46 * 1.414 + 14) : (labelTH + 20);
+    ctx.fillText(zone.tag, cx, cy + yOff);
+    if (zone.label) {
+      ctx.font = '10px monospace';
+      ctx.fillStyle = labelColor + 'bb';
+      ctx.fillText(zone.label, cx, cy + yOff + 12);
+    }
+    if (isDual) {
+      ctx.font = '8px monospace';
+      ctx.fillStyle = '#3a6a3a';
+      ctx.fillText('CYBER+KINETIC', cx, cy - 46 * 1.414 - 8);
+    }
+  } else if (zone.tag && (zone.c === 1 || zone.f === 1)) {
+    ctx.textAlign = 'center';
+    ctx.font = 'bold 11px monospace';
+    const col = zone.c >= 0 ? C_CFG[Math.max(0,zone.c)].text : F_CFG[Math.max(0,zone.f)].text;
+    ctx.fillStyle = col + 'cc';
+    ctx.fillText(zone.tag, cx, cy + labelTH + 16);
+  }
+
+  const tex = new THREE.CanvasTexture(cv);
+  tex.needsUpdate = true;
+
+  // Scene scale: single-domain uses full size; dual (cyber+physical overlap)
+  // scales DOWN so the composite symbol doesn't dominate the globe.
+  // Only zones where isDual===true (both c>=0 AND f>=0) get reduced.
+  const maxTier = Math.max(zone.c >= 0 ? zone.c : 9, zone.f >= 0 ? zone.f : 9);
+  const baseScale = maxTier === 0 ? 0.19 : maxTier === 1 ? 0.16 : 0.13;
+  const scale = isDual ? baseScale * 0.78 : baseScale;
+
+  const mat = new THREE.SpriteMaterial({ map: tex, transparent: true, depthWrite: false, depthTest: false });
+  const sprite = new THREE.Sprite(mat);
+  sprite.scale.set(scale, scale, 1);
+  scene.add(sprite);
+  return sprite;
+}
+
+// ── Pulse ring (for tier 0 zones — both cyber HOSTILE and MAJOR WAR) ─
+function makeThreatRing(colorHex) {
+  const pts = [];
+  for (let i = 0; i <= 64; i++) {
+    const a = i / 64 * Math.PI * 2;
+    pts.push(new THREE.Vector3(Math.cos(a), Math.sin(a), 0));
+  }
+  const geo = new THREE.BufferGeometry().setFromPoints(pts);
+  const mat = new THREE.LineBasicMaterial({
+    color: colorHex, transparent: true, opacity: 0.8, depthWrite: false, depthTest: false
+  });
+  const ring = new THREE.Line(geo, mat);
+  scene.add(ring);
+  return ring;
+}
+
+// ── Build all composite threat symbols ─────────────────────────────
+const threatSymbols = THREAT_ZONES.map(zone => {
+  const sprite  = makeCompositeSprite(zone);
+  const basePos = ll3d(zone.lat, zone.lon, 1.255);
+
+  // Ring: only for highest-tier zones (cyber HOSTILE or MAJOR WAR)
+  let ring = null;
+  if (zone.c === 0 && zone.f === 0) {
+    ring = makeThreatRing(0xff6633); // dual: orange-red blend
+  } else if (zone.c === 0) {
+    ring = makeThreatRing(0xff3300); // cyber only: red
+  } else if (zone.f === 0) {
+    ring = makeThreatRing(0xff7733); // conflict only: orange
+  }
+
+  return { zone, sprite, ring, basePos };
+});
+
+
+// ── Cyber popup raycaster ─────────────────────────────────────
+const raycaster  = new THREE.Raycaster();
+const mousePt    = new THREE.Vector2();
+let   popupOpen  = false;
+let   mouseDownX = 0, mouseDownY = 0;
+
+// Invisible sphere hitboxes for each cyber zone (c >= 0)
+const cyberHitboxes = threatSymbols
+  .filter(s => s.zone.c >= 0)
+  .map(s => {
+    const geo = new THREE.SphereGeometry(0.10, 8, 8);
+    const mat = new THREE.MeshBasicMaterial({ visible: false });
+    const mesh = new THREE.Mesh(geo, mat);
+    scene.add(mesh);
+    return { sym: s, mesh };
+  });
+
+function worldToScreen(pos) {
+  const v = pos.clone().project(camera);
+  return {
+    x: (v.x * 0.5 + 0.5) * window.innerWidth,
+    y: (-v.y * 0.5 + 0.5) * window.innerHeight
+  };
+}
+
+function showPopup(sym) {
+  const d = CYBER_DETAIL[sym.zone.tag];
+  if (!d) return;
+
+  document.getElementById('cp-badge').textContent  = d.tier;
+  document.getElementById('cp-badge').style.color  = d.tierColor;
+  document.getElementById('cp-badge').style.borderColor = d.tierColor;
+  document.getElementById('cp-tag').textContent    = sym.zone.tag;
+  document.getElementById('cp-city').textContent   = d.city;
+  document.getElementById('cp-incidents').textContent = d.incidents;
+  document.getElementById('cp-actor').textContent  = d.actor;
+  document.getElementById('cp-vectors').textContent = d.vectors;
+  document.getElementById('cp-targets').textContent = d.targets;
+
+  const trendEl = document.getElementById('cp-trend');
+  trendEl.textContent  = d.trend;
+  trendEl.className    = 'cp-val ' + d.trendClass;
+
+  document.getElementById('cp-last').textContent   = d.lastEvent;
+  document.getElementById('cp-source').textContent = d.source;
+
+  const popup = document.getElementById('cyber-popup');
+  popup.style.display = 'block';
+  popupOpen = true;
+
+  positionPopup(sym);
+}
+
+function positionPopup(sym) {
+  if (!popupOpen) return;
+  // Delegate to the unified positioner which handles both popups as a unit
+  positionBothPopups(sym);
+}
+
+// ── Unified dual-popup positioner ─────────────────────────────────
+// Places cyber + conflict popups together so they never clip the viewport.
+// Both popups are treated as a single horizontal (or vertical) unit.
+function positionBothPopups(sym) {
+  const worldPos = sym.basePos.clone().applyMatrix4(rotM);
+  const sc       = worldToScreen(worldPos);
+  const W        = window.innerWidth;
+  const H        = window.innerHeight;
+  const margin   = 12;
+  const gap      = 8;   // gap between the two popups
+
+  const cyberEl    = document.getElementById('cyber-popup');
+  const conflictEl = document.getElementById('conflict-popup');
+
+  const cyberOpen    = popupOpen         && cyberEl.style.display    !== 'none';
+  const conflictOpen = conflictPopupOpen && conflictEl.style.display !== 'none';
+
+  const cw  = 224; // cyber popup width
+  const fw  = 234; // conflict popup width
+  const ch  = cyberEl.offsetHeight    || 210;
+  const fh  = conflictEl.offsetHeight || 220;
+
+  const isDual = cyberOpen && conflictOpen;
+
+  // Vertical center on indicator
+  let y = sc.y - Math.max(ch, fh) / 2;
+  y = Math.max(margin, Math.min(H - Math.max(ch, fh) - margin, y));
+
+  if (isDual) {
+    const totalW = cw + gap + fw;
+
+    // Try placing the pair to the RIGHT of the indicator
+    let leftEdge = sc.x + 18;
+    if (leftEdge + totalW + margin <= W) {
+      // Fits to the right — cyber left, conflict right
+      cyberEl.style.left    = leftEdge + 'px';
+      conflictEl.style.left = (leftEdge + cw + gap) + 'px';
+    } else {
+      // Try placing the pair to the LEFT of the indicator
+      let rightEdge = sc.x - 18;
+      if (rightEdge - totalW >= margin) {
+        // Fits to the left
+        cyberEl.style.left    = (rightEdge - totalW) + 'px';
+        conflictEl.style.left = (rightEdge - fw) + 'px';
+      } else {
+        // Not enough horizontal space — stack vertically
+        // Cyber above, conflict below, both centered on indicator
+        const cx = Math.max(margin, Math.min(W - cw - margin, sc.x - cw / 2));
+        const fx = Math.max(margin, Math.min(W - fw - margin, sc.x - fw / 2));
+        cyberEl.style.left    = cx + 'px';
+        conflictEl.style.left = fx + 'px';
+        cyberEl.style.top     = Math.max(margin, sc.y - ch - gap / 2) + 'px';
+        conflictEl.style.top  = Math.min(H - fh - margin, sc.y + gap / 2) + 'px';
+        return; // y already set per-popup above
+      }
+    }
+    // Shared y for horizontal layout — align tops
+    cyberEl.style.top    = y + 'px';
+    conflictEl.style.top = y + 'px';
+
+  } else if (cyberOpen) {
+    // Single cyber popup — right if fits, else left
+    let x = sc.x + 18;
+    if (x + cw + margin > W) x = sc.x - cw - 18;
+    x = Math.max(margin, Math.min(W - cw - margin, x));
+    cyberEl.style.left = x + 'px';
+    cyberEl.style.top  = Math.max(margin, Math.min(H - ch - margin, y)) + 'px';
+
+  } else if (conflictOpen) {
+    // Single conflict popup — right if fits, else left
+    let x = sc.x + 18;
+    if (x + fw + margin > W) x = sc.x - fw - 18;
+    x = Math.max(margin, Math.min(W - fw - margin, x));
+    conflictEl.style.left = x + 'px';
+    conflictEl.style.top  = Math.max(margin, Math.min(H - fh - margin, y)) + 'px';
+  }
+}
+
+function closePopup() {
+  document.getElementById('cyber-popup').style.display = 'none';
+  popupOpen = false;
+  currentPopupSym = null;
+}
+
+let currentPopupSym = null;
+
+// Mouse down — record position for drag detection
+canvas.addEventListener('mousedown', e => {
+  mouseDownX = e.clientX;
+  mouseDownY = e.clientY;
+});
+
+// Click — only fires if pointer moved < 5px (true click, not drag)
+canvas.addEventListener('mouseup', e => {
+  const dx = e.clientX - mouseDownX;
+  const dy = e.clientY - mouseDownY;
+  if (Math.sqrt(dx*dx + dy*dy) >= 5) return;
+
+  const rect = canvas.getBoundingClientRect();
+  mousePt.x =  ((e.clientX - rect.left)  / rect.width)  * 2 - 1;
+  mousePt.y = -((e.clientY - rect.top)   / rect.height) * 2 + 1;
+
+  raycaster.setFromCamera(mousePt, camera);
+  const allMeshes = [
+    ...cyberHitboxes.map(h => h.mesh),
+    ...conflictHitboxes.map(h => h.mesh)
+  ];
+  const hits = raycaster.intersectObjects(allMeshes);
+
+  if (hits.length > 0) {
+    const hitMesh = hits[0].object;
+
+    // Check cyber hitboxes first
+    const cyberHit = cyberHitboxes.find(h => h.mesh === hitMesh);
+    if (cyberHit) {
+      if (currentPopupSym === cyberHit.sym && popupOpen) {
+        closePopup();
+        closeConflictPopup(); // also close conflict if open for this dual zone
+      } else {
+        currentPopupSym = cyberHit.sym;
+        showPopup(cyberHit.sym);
+        // If this zone also has conflict data, show conflict popup too
+        if (cyberHit.sym.zone.f >= 0) {
+          currentConflictSym = cyberHit.sym;
+          showConflictPopup(cyberHit.sym);
+        } else {
+          closeConflictPopup();
+        }
+      }
+      return;
+    }
+
+    // Check conflict hitboxes
+    const conflictHit = conflictHitboxes.find(h => h.mesh === hitMesh);
+    if (conflictHit) {
+      // Close cyber popup if this is a conflict-only zone
+      if (conflictHit.sym.zone.c < 0) {
+        closePopup();
+      }
+      if (currentConflictSym === conflictHit.sym && conflictPopupOpen) {
+        closeConflictPopup();
+        if (conflictHit.sym.zone.c < 0) closePopup();
+      } else {
+        currentConflictSym = conflictHit.sym;
+        showConflictPopup(conflictHit.sym);
+        // If dual zone also show cyber popup
+        if (conflictHit.sym.zone.c >= 0) {
+          currentPopupSym = conflictHit.sym;
+          showPopup(conflictHit.sym);
+        }
+      }
+      return;
+    }
+  }
+
+  // Click outside — close both
+  if (popupOpen)         closePopup();
+  if (conflictPopupOpen) closeConflictPopup();
+});
+
+// Close button
+document.getElementById('cp-close').addEventListener('click', e => {
+  e.stopPropagation();
+  closePopup();
+});
+
+// Hover — pointer cursor over any clickable zone
+canvas.addEventListener('mousemove', e => {
+  const rect = canvas.getBoundingClientRect();
+  mousePt.x =  ((e.clientX - rect.left)  / rect.width)  * 2 - 1;
+  mousePt.y = -((e.clientY - rect.top)   / rect.height) * 2 + 1;
+  raycaster.setFromCamera(mousePt, camera);
+  const allMeshes = [
+    ...cyberHitboxes.map(h => h.mesh),
+    ...conflictHitboxes.map(h => h.mesh)
+  ];
+  const hits = raycaster.intersectObjects(allMeshes);
+  canvas.style.cursor = hits.length > 0 ? 'pointer' : 'default';
+});
+
+
+// ── Conflict popup system ─────────────────────────────────────────
+// Hitboxes for all zones with f >= 0 (physical conflict present)
+const conflictHitboxes = threatSymbols
+  .filter(s => s.zone.f >= 0)
+  .map(s => {
+    const geo = new THREE.SphereGeometry(0.10, 8, 8);
+    const mat = new THREE.MeshBasicMaterial({ visible: false });
+    const mesh = new THREE.Mesh(geo, mat);
+    scene.add(mesh);
+    return { sym: s, mesh };
+  });
+
+let conflictPopupOpen  = false;
+let currentConflictSym = null;
+
+function showConflictPopup(sym) {
+  const tag = sym.zone.tag;
+  const d = CONFLICT_DETAIL[tag];
+  if (!d) {
+    console.warn('No CONFLICT_DETAIL entry for tag:', tag, sym.zone);
+    return;
+  }
+
+  const typeCfg = CONFLICT_TYPE_CFG[d.type] || { icon:'▲', color:'#ff8855', label:d.type };
+
+  document.getElementById('cf-tier').textContent        = d.tier;
+  document.getElementById('cf-tier').style.color        = d.tierColor;
+  document.getElementById('cf-tier').style.borderColor  = d.tierColor;
+  document.getElementById('cf-type-badge').textContent  = typeCfg.icon + ' ' + typeCfg.label;
+  document.getElementById('cf-type-badge').style.color  = typeCfg.color;
+  document.getElementById('cf-city').textContent        = d.city;
+  document.getElementById('cf-type').textContent        = typeCfg.label;
+  document.getElementById('cf-parties').textContent     = d.parties;
+  document.getElementById('cf-deaths').textContent      = d.deaths;
+  document.getElementById('cf-status').textContent      = d.status;
+
+  const tEl = document.getElementById('cf-trend');
+  tEl.textContent  = d.trend;
+  tEl.className    = 'cf-val ' + d.trendClass;
+
+  document.getElementById('cf-last').textContent   = d.lastEvent;
+  document.getElementById('cf-source').textContent = d.source;
+
+  const popup = document.getElementById('conflict-popup');
+  popup.style.display = 'block';
+  conflictPopupOpen = true;
+  positionConflictPopup(sym);
+}
+
+function positionConflictPopup(sym) {
+  if (!conflictPopupOpen) return;
+  positionBothPopups(sym);
+}
+
+function closeConflictPopup() {
+  document.getElementById('conflict-popup').style.display = 'none';
+  conflictPopupOpen  = false;
+  currentConflictSym = null;
+}
+
+document.getElementById('cf-close').addEventListener('click', e => {
+  e.stopPropagation();
+  closeConflictPopup();
+});
+
+// ── Animation ───────────────────────────────────────────────────────
+const clock = new THREE.Clock();
+let rotY = 1.1;
+let autoRotate = true;
+let isDragging = false;
+
+
+const rotM = new THREE.Matrix4();
+const _camFwd = new THREE.Vector3(0, 0, -1); // camera looks down -Z
+
+function animate() {
+  requestAnimationFrame(animate);
+  const dt = clock.getDelta();
+  const t  = clock.elapsedTime;
+  if (autoRotate) {
+    rotY += dt * 0.055;
+    // Keep rotY in 0..2PI and sync slider
+    const slider = document.getElementById('rot-slider');
+    if (!isDragging) {
+      sliderVal = Math.round(((rotY % (Math.PI * 2) + Math.PI * 2) % (Math.PI * 2)) / (Math.PI * 2) * 628);
+      if (typeof drawSlider === 'function') drawSlider();
+    }
+  }
+
+  if (earthMesh) earthMesh.rotation.y = rotY;
+
+  // Compose earth's full rotation: axial tilt (X) then spin (Y)
+  const tiltM = new THREE.Matrix4().makeRotationX(23.5 * Math.PI / 180);
+  rotM.makeRotationY(rotY);
+  rotM.premultiply(tiltM);
+
+  // Hub markers
+  // ── Gideon node hexagon sprites + fwd op sprites ─────────────────
+  [...nodeObjs, ...fwdOpObjs].forEach(n => {
+    const worldPos = n.base.clone().applyMatrix4(rotM);
+    const norm = worldPos.clone().normalize();
+    const dot = norm.dot(new THREE.Vector3(0, 0, 1));
+    const visible = dot > 0.08;
+    const fade = Math.min(1, (dot - 0.08) / 0.10);
+    n.sprite.position.copy(worldPos);
+    n.sprite.material.opacity = visible ? fade : 0;
+  });
+
+  // ── Composite threat symbols ─────────────────────────────────────
+  threatSymbols.forEach(sym => {
+    const worldPos = sym.basePos.clone().applyMatrix4(rotM);
+    const norm = worldPos.clone().normalize();
+    const dot  = norm.dot(new THREE.Vector3(0, 0, 1));
+    const visible     = dot > 0.08;
+    const horizonFade = Math.min(1, (dot - 0.08) / 0.10);
+
+    sym.sprite.position.copy(worldPos);
+    sym.sprite.material.opacity = visible ? horizonFade : 0;
+
+    if (sym.ring) {
+      sym.ring.position.copy(worldPos);
+      sym.ring.lookAt(camera.position);
+      const isMajor = sym.zone.c === 0 || sym.zone.f === 0;
+      const speed   = isMajor ? 1.4 : 0.8;
+      const pulse   = 0.052 + 0.018 * Math.sin(t * speed);
+      sym.ring.scale.setScalar(pulse);
+      sym.ring.material.opacity = visible ? horizonFade * (0.7 + 0.3 * Math.sin(t * speed)) : 0;
+    }
+  });
+
+  // Advance simulation time
+  tSim += dt * TIME_SCALE;
+
+  sats.forEach(sat => {
+    const pos = keplerPos(sat.def, tSim);
+    sat.mesh.position.copy(pos);
+    sat.mesh.lookAt(0, 0, 0);
+
+    // Trail: prepend new ECI position, cap at TRAIL_LEN
+    sat.trailPts.unshift(pos.clone());
+    if (sat.trailPts.length > TRAIL_LEN) sat.trailPts.pop();
+    if (sat.trailPts.length >= 2) {
+      const segs = buildTrailSegments(sat.trailPts, sat.trailStyle);
+      if (segs.length >= 2) sat.trailGeo.setFromPoints(segs);
+    }
+
+    // Orbit ring: update RAAN with enhanced precession for visual clarity.
+    // RING_PRECESSION_MULTIPLIER decouples ring drift from satellite speed.
+    // Set to 1.0 to revert to physically accurate precession rate.
+    sat._fc = (sat._fc || 0) + 1;
+    if (sat._fc % 60 === 1) {
+      const raanDotRPS = sat.def.raanDotDegPerDay * RAD / 86400;
+      const raanNow    = sat.def.raanDeg * RAD
+                         + raanDotRPS * tSim * RING_PRECESSION_MULTIPLIER;
+      const pts = buildOrbitRingPts(sat.def, raanNow);
+      sat.ringGeo.setFromPoints(pts);
+      sat.ringGeo.attributes.position.needsUpdate = true;
+    }
+  });
+
+
+  // Update hitbox positions to match rotating earth
+  cyberHitboxes.forEach(h => {
+    h.mesh.position.copy(h.sym.basePos.clone().applyMatrix4(rotM));
+    if (currentPopupSym === h.sym && popupOpen) {
+      const norm = h.mesh.position.clone().normalize();
+      const dot  = norm.dot(new THREE.Vector3(0, 0, 1));
+      if (dot < 0.08) { closePopup(); closeConflictPopup(); }
+      else { positionPopup(h.sym); if (conflictPopupOpen) positionConflictPopup(h.sym); }
+    }
+  });
+
+  conflictHitboxes.forEach(h => {
+    h.mesh.position.copy(h.sym.basePos.clone().applyMatrix4(rotM));
+    if (currentConflictSym === h.sym && conflictPopupOpen) {
+      const norm = h.mesh.position.clone().normalize();
+      const dot  = norm.dot(new THREE.Vector3(0, 0, 1));
+      if (dot < 0.08) { closeConflictPopup(); }
+      else if (h.sym.zone.c < 0) { positionConflictPopup(h.sym); }
+    }
+  });
+
+  renderer.render(scene, camera);
+}
+
+// ── Load real GeoJSON from CDN ───────────────────────────────────────
+// Natural Earth 110m countries — accurate, lightweight (~100KB)
+async function init() {
+  try {
+    const res = await fetch(
+      'https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json'
+    );
+    const topo = await res.json();
+
+    // Inline TopoJSON→GeoJSON converter (no library needed)
+    // world-atlas uses TopoJSON format
+    const topoGeo = topoToGeo(topo, topo.objects.countries);
+
+    drawBase();
+    drawGeoJSON(topoGeo);
+
+    buildEarth();
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('hud').style.display = 'block';
+
+    // Wire up slider controls — DOM is guaranteed visible now
+    const sliderCanvas = document.getElementById('rot-slider-canvas');
+    const sCtx = sliderCanvas.getContext('2d');
+    const autoBtn = document.getElementById('auto-btn');
+    const SW = 200, SH = 16;
+    let sliderVal = 110; // 0-628 range
+
+    function drawSlider() {
+      sCtx.clearRect(0, 0, SW, SH);
+      const pct = sliderVal / 628;
+      const thumbX = 6 + pct * (SW - 12);
+      // Track
+      sCtx.fillStyle = '#0e1e0e';
+      sCtx.fillRect(0, SH/2 - 1, SW, 2);
+      // Fill
+      sCtx.fillStyle = '#2a7a20';
+      sCtx.fillRect(0, SH/2 - 1, thumbX, 2);
+      // Thumb — square, dark fill, green border
+      sCtx.strokeStyle = '#4cdd30';
+      sCtx.lineWidth = 1.5;
+      sCtx.fillStyle = '#0b140b';
+      sCtx.fillRect(thumbX - 5, SH/2 - 5, 10, 10);
+      sCtx.strokeRect(thumbX - 5, SH/2 - 5, 10, 10);
+    }
+
+    function sliderPosToVal(clientX) {
+      const rect = sliderCanvas.getBoundingClientRect();
+      const x = Math.max(0, Math.min(SW, clientX - rect.left));
+      return Math.round((x / SW) * 628);
+    }
+
+    sliderCanvas.addEventListener('mousedown', e => {
+      isDragging = true;
+      autoRotate = false;
+      autoBtn.classList.remove('active');
+      sliderVal = sliderPosToVal(e.clientX);
+      rotY = (sliderVal / 628) * Math.PI * 2;
+      drawSlider();
+    });
+    sliderCanvas.addEventListener('touchstart', e => {
+      isDragging = true;
+      autoRotate = false;
+      autoBtn.classList.remove('active');
+      sliderVal = sliderPosToVal(e.touches[0].clientX);
+      rotY = (sliderVal / 628) * Math.PI * 2;
+      drawSlider();
+    }, { passive: true });
+    window.addEventListener('mousemove', e => {
+      if (!isDragging) return;
+      sliderVal = sliderPosToVal(e.clientX);
+      rotY = (sliderVal / 628) * Math.PI * 2;
+      drawSlider();
+    });
+    window.addEventListener('mouseup', () => { isDragging = false; });
+    window.addEventListener('touchend', () => { isDragging = false; });
+
+    // Fix: slider touchmove was missing — finger drag now updates rotY on mobile
+    window.addEventListener('touchmove', e => {
+      if (!isDragging) return;
+      sliderVal = sliderPosToVal(e.touches[0].clientX);
+      rotY = (sliderVal / 628) * Math.PI * 2;
+      drawSlider();
+    }, { passive: true });
+
+    // Single-finger swipe-to-rotate + two-finger pinch-to-zoom (mobile only)
+    const ZOOM_MIN = 4.0, ZOOM_MAX = 14.0;
+    let _touchStartX = 0, _touchLastX = 0, _touchRotating = false;
+    let _pinchDist0 = 0, _pinching = false;
+
+    function _pinchDist(touches) {
+      const dx = touches[1].clientX - touches[0].clientX;
+      const dy = touches[1].clientY - touches[0].clientY;
+      return Math.sqrt(dx * dx + dy * dy);
+    }
+
+    canvas.addEventListener('touchstart', e => {
+      if (e.touches.length >= 2) e.preventDefault();
+      if (e.touches.length === 2) {
+        _pinching = true;
+        _touchRotating = false;
+        _pinchDist0 = _pinchDist(e.touches);
+      } else {
+        _pinching = false;
+        _touchStartX = e.touches[0].clientX;
+        _touchLastX  = _touchStartX;
+        _touchRotating = false;
+      }
+    }, { passive: false });
+
+    canvas.addEventListener('touchmove', e => {
+      if (e.touches.length >= 2) e.preventDefault();
+      if (e.touches.length === 2 && _pinching) {
+        const dist = _pinchDist(e.touches);
+        const newZ = camera.position.z * (_pinchDist0 / dist);
+        camera.position.z = Math.min(ZOOM_MAX, Math.max(ZOOM_MIN, newZ));
+        _pinchDist0 = dist;
+      } else if (e.touches.length === 1 && !_pinching) {
+        const x = e.touches[0].clientX;
+        const dx = x - _touchLastX;
+        if (!_touchRotating && Math.abs(x - _touchStartX) > 8) {
+          _touchRotating = true;
+          autoRotate = false;
+          autoBtn.classList.remove('active');
+        }
+        if (_touchRotating) {
+          rotY += dx * 0.007;
+          _touchLastX = x;
+        }
+      }
+    }, { passive: false });
+
+    canvas.addEventListener('touchend', e => {
+      if (e.touches.length < 2) _pinching = false;
+      if (e.touches.length === 0) _touchRotating = false;
+    }, { passive: true });
+
+    drawSlider();
+
+    // Wire toggle buttons via JS — guaranteed to work
+    document.getElementById('ops-toggle').addEventListener('click', function() {
+      const w = document.getElementById('ops-wrap');
+      w.classList.toggle('open');
+      this.textContent = w.classList.contains('open') ? '✕ OPS' : '⬡ OPS';
+    });
+    document.getElementById('legend-toggle').addEventListener('click', function() {
+      const w = document.getElementById('legend-wrap');
+      w.classList.toggle('open');
+      this.textContent = w.classList.contains('open') ? '✕ INTEL' : '≡ INTEL';
+    });
+
+    autoBtn.addEventListener('click', () => {
+      autoRotate = !autoRotate;
+      autoBtn.classList.toggle('active', autoRotate);
+    });
+
+    animate();
+  } catch(e) {
+    document.getElementById('loading').textContent = 'ERROR: ' + e.message;
+  }
+}
+
+// Minimal TopoJSON→GeoJSON decoder
+// Handles the world-atlas format without needing topojson library
+function topoToGeo(topo, obj) {
+  const arcs = topo.arcs;
+  const scale = topo.transform ? topo.transform.scale : [1,1];
+  const translate = topo.transform ? topo.transform.translate : [0,0];
+
+  // Decode a single arc index into coordinate array
+  function decodeArc(idx) {
+    let reverse = false;
+    if (idx < 0) { idx = ~idx; reverse = true; }
+    const raw = arcs[idx];
+    const pts = [];
+    let x = 0, y = 0;
+    for (const [dx, dy] of raw) {
+      x += dx; y += dy;
+      pts.push([
+        x * scale[0] + translate[0],
+        y * scale[1] + translate[1]
+      ]);
+    }
+    return reverse ? pts.reverse() : pts;
+  }
+
+  // Join arc sequences into a ring
+  function arcToRing(arcIdxs) {
+    let ring = [];
+    for (const idx of arcIdxs) {
+      const arc = decodeArc(idx);
+      // avoid duplicating junction point
+      if (ring.length > 0) arc.shift();
+      ring = ring.concat(arc);
+    }
+    return ring;
+  }
+
+  const features = obj.geometries.map(geom => {
+    let geometry;
+    if (geom.type === 'Polygon') {
+      geometry = {
+        type: 'Polygon',
+        coordinates: geom.arcs.map(arcToRing)
+      };
+    } else if (geom.type === 'MultiPolygon') {
+      geometry = {
+        type: 'MultiPolygon',
+        coordinates: geom.arcs.map(poly => poly.map(arcToRing))
+      };
+    } else {
+      geometry = null;
+    }
+    return { type: 'Feature', properties: geom.properties || {}, geometry };
+  });
+
+  return { type: 'FeatureCollection', features };
+}
+
+init();
+</script>
+</body>
+</html>
