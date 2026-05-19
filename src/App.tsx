@@ -1,68 +1,53 @@
 import { useState, useEffect } from 'react'
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom'
-import { AnimatePresence } from 'framer-motion'
-import { Nav } from './components/Nav'
-import { Footer } from './components/Footer'
-import { GridOverlay } from './components/GridOverlay'
-import { SplashScreen } from './components/SplashScreen'
+import Nav, { Classification } from './components/Nav'
+import Splash from './components/Splash'
+import { useMeta } from './hooks/useMeta'
 import Home from './pages/Home'
-import Capabilities from './pages/Capabilities'
-import Solutions from './pages/Solutions'
-import About from './pages/About'
+import Programs from './pages/Programs'
+import CapabilitiesPage from './pages/Capabilities'
+import Mission from './pages/Mission'
+import Contact from './pages/Contact'
 
-function ScrollHandler() {
-  const location = useLocation()
-
-  useEffect(() => {
-    if (location.hash) {
-      const id = location.hash.slice(1)
-      // Delay to allow page render
-      const timer = setTimeout(() => {
-        const el = document.getElementById(id)
-        if (el) {
-          el.scrollIntoView({ behavior: 'smooth' })
-        }
-      }, 150)
-      return () => clearTimeout(timer)
-    } else {
-      window.scrollTo({ top: 0, behavior: 'instant' as ScrollBehavior })
-    }
-  }, [location.pathname, location.hash])
-
+function ScrollToTop() {
+  const { pathname } = useLocation()
+  useEffect(() => { window.scrollTo(0, 0) }, [pathname])
   return null
 }
 
 function AppContent() {
+  useMeta()
   return (
     <>
-      <GridOverlay />
-      <ScrollHandler />
+      <Classification />
       <Nav />
-      <main style={{ minHeight: '100vh' }}>
+      <ScrollToTop />
+      <main>
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/capabilities" element={<Capabilities />} />
-          <Route path="/solutions" element={<Solutions />} />
-          <Route path="/about" element={<About />} />
+          <Route path="/programs" element={<Programs />} />
+          <Route path="/capabilities" element={<CapabilitiesPage />} />
+          <Route path="/mission" element={<Mission />} />
+          <Route path="/contact" element={<Contact />} />
         </Routes>
       </main>
-      <Footer />
     </>
   )
 }
 
 export default function App() {
-  const [splashDone, setSplashDone] = useState(() => {
-    return !!sessionStorage.getItem('gd-splash-shown')
-  })
+  const [splashDone, setSplashDone] = useState(
+    () => !!sessionStorage.getItem('gd-splash')
+  )
 
   return (
     <BrowserRouter>
-      <AnimatePresence>
-        {!splashDone && (
-          <SplashScreen onComplete={() => setSplashDone(true)} />
-        )}
-      </AnimatePresence>
+      {!splashDone && (
+        <Splash onDone={() => {
+          sessionStorage.setItem('gd-splash', '1')
+          setSplashDone(true)
+        }} />
+      )}
       {splashDone && <AppContent />}
     </BrowserRouter>
   )

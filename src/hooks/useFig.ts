@@ -3,14 +3,15 @@ import { useState, useEffect, useCallback } from 'react'
 const FIG_UNLOCK_KEY = '__gideon_fig_unlocked'
 const figPlaintext: Record<string, string> = {}
 
-const b64decode = (s: string): Uint8Array => {
+const b64decode = (s: string): Uint8Array<ArrayBuffer> => {
   const bin = atob(s)
-  const bytes = new Uint8Array(bin.length)
+  const buf = new ArrayBuffer(bin.length)
+  const bytes = new Uint8Array(buf)
   for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i)
   return bytes
 }
 
-const deriveFigKey = async (password: string, salt: Uint8Array, iters: number): Promise<CryptoKey> => {
+const deriveFigKey = async (password: string, salt: Uint8Array<ArrayBuffer>, iters: number): Promise<CryptoKey> => {
   const passKey = await crypto.subtle.importKey(
     'raw', new TextEncoder().encode(password), 'PBKDF2', false, ['deriveKey']
   )
