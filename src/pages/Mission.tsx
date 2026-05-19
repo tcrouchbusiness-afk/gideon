@@ -11,7 +11,7 @@ export default function Mission() {
         </div>
         <div className="mission-founders">
           <div className="mission-founders-photo">
-            <img src="war-room.png" alt="Operations bay" className="mission-founders-img" />
+            <img src="/war-room.png" alt="Operations bay" className="mission-founders-img" />
             <div className="mission-founders-overlay" />
             <div className="mission-founders-scan" />
             <div className="mission-founders-corners">
@@ -38,7 +38,7 @@ export default function Mission() {
             ].map(([n, r, p]) =>
               <div key={n} className="team-card">
                 <div className="team-photo team-photo-redacted">
-                  <img src="silhouette.svg" alt="" className="team-silhouette" />
+                  <img src="/silhouette.svg" alt="" className="team-silhouette" />
                 </div>
                 <div className="team-info">
                   <div className="team-name">{n}</div>
