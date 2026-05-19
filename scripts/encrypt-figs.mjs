@@ -60,6 +60,7 @@ html,body{height:100%;background:var(--bg);color:var(--fg);font-family:var(--mon
 .log{background:var(--bg2);border:1px solid var(--line);padding:10px;max-height:180px;overflow-y:auto;font-size:10px;line-height:1.8}
 .log-line{color:var(--fg3)}.log-line .ts{color:var(--olive);margin-right:8px}.log-line .ok{color:var(--ok)}.log-line .warn{color:var(--warn)}
 .bottombar{padding:6px 14px;border-top:1px solid var(--line);background:var(--bg2);display:flex;justify-content:space-between;font-size:10px;color:var(--fg3);letter-spacing:.08em}
+::-webkit-scrollbar{width:5px;height:5px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--line2);border-radius:2px}::-webkit-scrollbar-thumb:hover{background:var(--olive2)}*{scrollbar-width:thin;scrollbar-color:var(--line2) var(--bg)}
 </style></head><body>
 <div class="shell">
   <div class="topbar">
@@ -244,6 +245,7 @@ canvas{position:absolute;inset:0;width:100%;height:100%}
 .drift-line .ts{color:var(--olive);margin-right:6px}
 .drift-line .new{color:var(--ok)}.drift-line .chg{color:var(--warn)}.drift-line .rem{color:var(--crit)}
 .bottombar{padding:6px 14px;border-top:1px solid var(--line);background:var(--bg2);display:flex;justify-content:space-between;font-size:10px;color:var(--fg3);letter-spacing:.08em}
+::-webkit-scrollbar{width:5px;height:5px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--line2);border-radius:2px}::-webkit-scrollbar-thumb:hover{background:var(--olive2)}*{scrollbar-width:thin;scrollbar-color:var(--line2) var(--bg)}
 </style></head><body>
 <div class="shell">
   <div class="topbar">
@@ -435,6 +437,7 @@ html,body{height:100%;background:var(--bg);color:var(--fg);font-family:var(--mon
 .progress{background:var(--line);height:3px;border-radius:2px;margin-top:6px;overflow:hidden}
 .progress-fill{height:100%;background:var(--olive2);border-radius:2px;transition:.4s}
 .bottombar{padding:6px 14px;border-top:1px solid var(--line);background:var(--bg2);display:flex;justify-content:space-between;font-size:10px;color:var(--fg3);letter-spacing:.08em}
+::-webkit-scrollbar{width:5px;height:5px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--line2);border-radius:2px}::-webkit-scrollbar-thumb:hover{background:var(--olive2)}*{scrollbar-width:thin;scrollbar-color:var(--line2) var(--bg)}
 </style></head><body>
 <div class="shell">
   <div class="topbar">
