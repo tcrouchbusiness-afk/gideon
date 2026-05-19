@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 
+
 // Glyph used in nav + footer
 export const Glyph = ({ size = 22 }: { size?: number }) => (
   <img
@@ -60,10 +61,10 @@ export default function Nav() {
   return (
     <>
       <nav className="nav">
-        <div className="nav-logo" onClick={() => go('/')}>
+        <NavLink to="/" className="nav-logo" onClick={() => { setOpen(false); window.scrollTo(0, 0); }}>
           <Glyph size={22} />
           <span className="lockup">GIDEON DYNAMICS</span>
-        </div>
+        </NavLink>
         <div className="nav-links">
           {links.map(l => (
             <NavLink
@@ -92,12 +93,16 @@ export default function Nav() {
         className={`nav-drawer-backdrop${open ? ' open' : ''}`}
         onClick={() => setOpen(false)}
       />
-      <aside className={`nav-drawer${open ? ' open' : ''}`} aria-hidden={!open}>
+      <aside
+        className={`nav-drawer${open ? ' open' : ''}`}
+        aria-hidden={!open}
+        {...(!open ? { inert: true } : {})}
+      >
         <div className="nav-drawer-head">
-          <div className="nav-logo">
+          <NavLink to="/" className="nav-logo" onClick={() => { setOpen(false); window.scrollTo(0, 0); }}>
             <Glyph size={22} />
             <span className="lockup">GIDEON DYNAMICS</span>
-          </div>
+          </NavLink>
           <button
             className="nav-drawer-close"
             aria-label="Close menu"
