@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Glyph } from './Nav';
 
 const SPLASH_LINES = [
@@ -16,9 +16,11 @@ interface SplashScreenProps {
 export default function SplashScreen({ onDone }: SplashScreenProps) {
   const [visLines, setVisLines] = useState(0);
   const [typed, setTyped] = useState('');
-  const [curLine, setCurLine] = useState(0);
   const [showLogo, setShowLogo] = useState(false);
   const [out, setOut] = useState(false);
+
+  const onDoneRef = useRef(onDone);
+  useEffect(() => { onDoneRef.current = onDone; }, [onDone]);
 
   useEffect(() => {
     const T: ReturnType<typeof setTimeout>[] = [];
@@ -29,13 +31,12 @@ export default function SplashScreen({ onDone }: SplashScreenProps) {
       if (line >= SPLASH_LINES.length) {
         T.push(setTimeout(() => setShowLogo(true), 250));
         T.push(setTimeout(() => setOut(true), 1200));
-        T.push(setTimeout(onDone, 1800));
+        T.push(setTimeout(() => onDoneRef.current(), 1800));
         return;
       }
       const txt = SPLASH_LINES[line].text;
       if (char <= txt.length) {
         setTyped(txt.slice(0, char));
-        setCurLine(line);
         char++;
         T.push(
           setTimeout(
@@ -53,7 +54,7 @@ export default function SplashScreen({ onDone }: SplashScreenProps) {
 
     T.push(setTimeout(step, 200));
     return () => T.forEach(clearTimeout);
-  }, [onDone]);
+  }, []);
 
   return (
     <div className={'splash' + (out ? ' splash--out' : '')}>
@@ -76,7 +77,7 @@ export default function SplashScreen({ onDone }: SplashScreenProps) {
                 key={i}
                 className={
                   'splash-line' +
-                  (SPLASH_LINES[curLine]?.ok ? ' splash-line--ok' : '')
+                  (SPLASH_LINES[visLines]?.ok ? ' splash-line--ok' : '')
                 }
               >
                 {typed}
