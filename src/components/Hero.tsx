@@ -1,6 +1,6 @@
 // Hero variants — three layouts, switchable via variant prop
 import { useState, useEffect } from 'react'
-import { useNavigate, Link } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { NowUTC } from './Nav'
 import HeroCanvas from './HeroCanvas'
 import { LiveFeed } from './LiveFeed'
@@ -72,11 +72,6 @@ function HeroTerminal({ sub }: { sub: string }) {
   const [step, setStep] = useState(0)
   const navigate = useNavigate()
 
-  useEffect(() => {
-    const id = setInterval(() => setStep(s => Math.min(s + 1, 6)), 700)
-    return () => clearInterval(id)
-  }, [])
-
   const lines = [
     { t: '$ gideon auth --identity defender.07 --token ******', c: '' },
     { t: '✓ identity verified · clearance: TS/SCI · enclave: REDOUBT-A', c: 'ok' },
@@ -86,6 +81,11 @@ function HeroTerminal({ sub }: { sub: string }) {
     { t: '! 3 anomalies isolated · 0 false positives · posture auto-staged', c: 'warn' },
     { t: '✓ perimeter holding · zero data egress', c: 'ok' },
   ]
+
+  useEffect(() => {
+    const id = setInterval(() => setStep(s => Math.min(s + 1, lines.length - 1)), 700)
+    return () => clearInterval(id)
+  }, [])
 
   return (
     <section className="hero v-terminal">
@@ -106,9 +106,9 @@ function HeroTerminal({ sub }: { sub: string }) {
         </h1>
         <div className="terminal">
           {lines.slice(0, step + 1).map((l, i) => (
-            <span key={i} className={`l ${l.c}`}>{l.t}</span>
+            <span key={`${i}-${l.t}`} className={`l ${l.c}`}>{l.t}</span>
           ))}
-          <span className="l">{step >= 6 ? '$ ' : ''}<span className="cursor"></span></span>
+          <span className="l">{step >= lines.length - 1 ? '$ ' : ''}<span className="cursor"></span></span>
         </div>
         <div className="hero-actions">
           <button className="btn primary" onClick={() => navigate('/contact')}>Request Briefing →</button>
