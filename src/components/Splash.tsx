@@ -45,6 +45,7 @@ export default function SplashScreen({ onDone }: SplashScreenProps) {
           )
         );
       } else {
+        setTyped('');
         setVisLines((v) => v + 1);
         line++;
         char = 0;
@@ -77,7 +78,7 @@ export default function SplashScreen({ onDone }: SplashScreenProps) {
                 key={i}
                 className={
                   'splash-line' +
-                  (SPLASH_LINES[visLines]?.ok ? ' splash-line--ok' : '')
+                  (l.ok ? ' splash-line--ok' : '')
                 }
               >
                 {typed}
