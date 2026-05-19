@@ -11,7 +11,7 @@
 import { useState, useEffect, useRef } from 'react'
 import GlobePosture from './Globe'
 
-const MODE: string = 'poster'
+const MODE: 'poster' | 'live' | 'lazy' = 'poster'
 
 const LiveGlobe = () => <GlobePosture />
 
@@ -44,19 +44,19 @@ const LazyGlobe = () => {
   )
 }
 
+const STATUS_LINES = [
+  'INITIATING HANDSHAKE',
+  'ATTESTING THEATERS',
+  'DECRYPTING TELEMETRY',
+  'SYNCING ORBITAL',
+  'STREAM LIVE',
+]
+
 // Poster variant — static image with an "Activate" button that swaps in the live globe
 const PosterGlobe = () => {
   // States: 'idle' | 'booting' | 'live'
   const [state, setState] = useState<'idle' | 'booting' | 'live'>('idle')
   const [statusIdx, setStatusIdx] = useState(0)
-
-  const STATUS_LINES = [
-    'INITIATING HANDSHAKE',
-    'ATTESTING THEATERS',
-    'DECRYPTING TELEMETRY',
-    'SYNCING ORBITAL',
-    'STREAM LIVE',
-  ]
 
   // Boot sequence: cycle status lines, then transition to 'live'
   useEffect(() => {
@@ -96,7 +96,7 @@ const PosterGlobe = () => {
           aria-label="Activate live global posture feed"
         >
           <img
-            src="globe-poster.png"
+            src="/globe-poster.png"
             alt="Global posture — 9 theaters under continuous attestation"
             className="globe-poster-img"
           />
