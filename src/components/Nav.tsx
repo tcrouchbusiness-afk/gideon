@@ -5,7 +5,7 @@ import { NavLink, useNavigate } from 'react-router-dom';
 // Glyph used in nav + footer
 export const Glyph = ({ size = 22 }: { size?: number }) => (
   <img
-    src="/logo.svg"
+    src="/gideonlogo.svg"
     alt="Gideon Dynamics"
     height={size}
     style={{ display: 'block', height: size, width: 'auto', objectFit: 'contain' }}
