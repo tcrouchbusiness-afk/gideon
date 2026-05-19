@@ -1,3 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
-  <image href="/favicon.png" x="13" y="0" width="74" height="100" preserveAspectRatio="xMidYMid meet"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <rect width="32" height="32" fill="#0d1410"/>
+  <polygon points="16,4 27,16 16,28 5,16" fill="#9aa884"/>
+  <polygon points="19,7 27,16 19,25 11,16" fill="#0d1410"/>
+  <polygon points="19,13.5 21.5,18 16.5,18" fill="#9aa884"/>
 </svg>
