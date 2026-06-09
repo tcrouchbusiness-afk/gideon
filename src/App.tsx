@@ -8,6 +8,7 @@ import Programs from './pages/Programs'
 import CapabilitiesPage from './pages/Capabilities'
 import Mission from './pages/Mission'
 import Contact from './pages/Contact'
+import Consulting from './pages/Consulting'
 
 function ScrollToTop() {
   const { pathname } = useLocation()
@@ -29,6 +30,7 @@ function AppContent() {
           <Route path="/capabilities" element={<CapabilitiesPage />} />
           <Route path="/mission" element={<Mission />} />
           <Route path="/contact" element={<Contact />} />
+          <Route path="/consulting" element={<Consulting />} />
         </Routes>
       </main>
     </>
