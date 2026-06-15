@@ -79,7 +79,7 @@ window.PRODUCT = {
     headline: 'Move at',
     headlineAccent: 'mission speed.',
     sub: 'A launch like this is roughly two months of design, 3D, and front-end engineering. We can build it for your platform — one reveal or the entire product narrative.',
-    email: 'tcrouchbusiness@gmail.com',
+    email: 'trenton@thegideoncorp.com',
     subject: 'GD-1 WRAITH launch — build a product reveal for our platform',
   },
 
