@@ -111,6 +111,15 @@ section{position:relative;padding:104px 0}
 .figure .cap .go{font-family:var(--font-mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);white-space:nowrap;display:inline-flex;align-items:center;gap:6px}
 .figure:hover .cap .go{color:var(--accent)}
 .figure .chip{position:absolute;top:12px;left:12px;font-family:var(--font-mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);background:rgba(10,12,15,.78);backdrop-filter:blur(4px);border:1px solid rgba(242,169,0,.4);border-radius:5px;padding:5px 9px}
+/* founder portrait (in #why) — framed like the figures, but portrait + still (no hover-zoom) */
+.figure.portrait{cursor:default;border-color:var(--accent);box-shadow:0 20px 60px -34px rgba(0,0,0,.85),0 0 0 1px rgba(242,169,0,.12)}
+.figure.portrait .frame-img{aspect-ratio:4/5}
+.figure.portrait .frame-img img{object-fit:cover;filter:grayscale(100%) contrast(1.02)}
+.figure.portrait:hover{transform:none;border-color:var(--accent);box-shadow:0 20px 60px -34px rgba(0,0,0,.85),0 0 0 1px rgba(242,169,0,.12)}
+.figure.portrait:hover .frame-img img{transform:none}
+.why-copy>p{color:var(--muted);font-size:15.5px;line-height:1.65}
+.why-copy>p+p{margin-top:16px}
+.why-copy>p strong{color:var(--text);font-weight:600}
 
 /* pillars */
 .pillars{display:grid;grid-template-columns:1fr 1fr;gap:14px}
@@ -214,6 +223,8 @@ section{position:relative;padding:104px 0}
 .footer .ftag{font-family:var(--font-mono);font-size:12px;color:var(--muted)}
 .footer a.contact{color:var(--accent)}
 .footer .fdemo{font-family:var(--font-mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);border:var(--hair);border-radius:5px;padding:6px 11px}
+.footer a.flink{font-family:var(--font-mono);font-size:12px;letter-spacing:.04em;color:var(--muted);text-decoration:none;transition:color var(--dur) var(--ease)}
+.footer a.flink:hover{color:var(--accent)}
 
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.reveal{opacity:1;transform:none}}
 </style>
@@ -233,6 +244,7 @@ section{position:relative;padding:104px 0}
     <a href="#moment">The moment</a>
     <a href="#build">What we build</a>
     <a href="#wraith">Work</a>
+    <a href="/work" target="_blank" rel="noopener">All work</a>
     <a href="#why">Why us</a>
   </div>
   <a class="nav-cta" href="#contact">15-min teardown</a>
@@ -504,13 +516,21 @@ section{position:relative;padding:104px 0}
 <!-- WHY US -->
 <section id="why">
   <div class="wrap">
-    <div class="section-head">
-      <span class="eyebrow reveal"><span class="idx">05</span> &nbsp;/&nbsp; Why us</span>
-      <h2 class="reveal d1">We've done it — and we move <span class="accent">like you do.</span></h2>
-    </div>
-    <div class="why">
-      <p class="reveal d2">We drove <strong>$100M+ in collected contract revenue</strong> for a defense company, modernized the operating system that made delivering it fast, and built the internal comms system that ran it. We've brought millions more into startups and built the teams behind them.</p>
-      <p class="reveal d2">We're not the old guard from Washington with a fixed playbook. We're close to where you are — in age, in mindset, in pace. We adapt fast, we use the newest tools, and <strong>everything we build, you own.</strong> Take what we give you and run with it, change it, or throw it out. It's yours.</p>
+    <div class="split" style="align-items:flex-start">
+      <div>
+        <div class="section-head">
+          <span class="eyebrow reveal"><span class="idx">05</span> &nbsp;/&nbsp; Why us</span>
+          <h2 class="reveal d1">We've done it — and we move <span class="accent">like you do.</span></h2>
+        </div>
+        <div class="why-copy" style="margin-top:24px">
+          <p class="reveal d2">We drove <strong>$100M+ in collected contract revenue</strong> for a defense company, modernized the operating system that made delivering it fast, and built the internal comms system that ran it. We've brought millions more into startups and built the teams behind them.</p>
+          <p class="reveal d2">We're not the old guard from Washington with a fixed playbook. We're close to where you are — in age, in mindset, in pace. We adapt fast, we use the newest tools, and <strong>everything we build, you own.</strong> Take what we give you and run with it, change it, or throw it out. It's yours.</p>
+        </div>
+      </div>
+      <div class="figure portrait reveal d3">
+        <div class="frame-img"><img src="/consulting/assets/pic.jpg" alt="The Gideon Corp. founder — prior service, field" loading="lazy"></div>
+        <div class="cap"><div class="t"><span>Founder · CEO</span></div></div>
+      </div>
     </div>
   </div>
 </section>
@@ -538,6 +558,7 @@ section{position:relative;padding:104px 0}
     </svg>
     <span class="ftag">Sovereign operator at mission speed.</span>
   </div>
+  <a class="flink" href="/work" target="_blank" rel="noopener">See all work →</a>
   <span class="ftag" style="opacity:.8">tcrouchbusiness@gmail.com</span>
   <span class="fdemo">Featured work is demonstration · synthetic or anonymized data</span>
 </footer>
