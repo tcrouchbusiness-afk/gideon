@@ -70,7 +70,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;opa
 /* ===== grid ===== */
 .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;padding:26px var(--pad) 10px}
 @media(max-width:1040px){.grid{grid-template-columns:repeat(2,1fr)}}
-@media(max-width:680px){.grid{grid-template-columns:1fr}.hero-stats{gap:24px}}
+@media(max-width:680px){.grid{grid-template-columns:1fr}.hero-stats{gap:24px}.footer{flex-direction:column;align-items:flex-start;gap:16px}.card .actions{gap:8px}}
 
 .card{background:var(--surface);border:var(--hair);border-radius:var(--radius);overflow:hidden;display:flex;flex-direction:column;
   transition:transform var(--dur) var(--ease),border-color var(--dur) var(--ease),box-shadow var(--dur) var(--ease);position:relative}
