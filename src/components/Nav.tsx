@@ -34,11 +34,12 @@ export const Classification = () => (
   <div className="classification">UNCLASSIFIED // FOR PUBLIC RELEASE — GIDEON DYNAMICS, INC.</div>
 );
 
-const links = [
+const links: { to: string; label: string; external?: boolean }[] = [
   { to: '/',             label: 'Index' },
   { to: '/programs',    label: 'Programs' },
   { to: '/capabilities', label: 'Capabilities' },
   { to: '/mission',     label: 'Mission' },
+  { to: '/work',        label: 'Work', external: true },
   { to: '/contact',     label: 'Contact' },
 ];
 
@@ -66,7 +67,9 @@ export default function Nav() {
           <span className="lockup">GIDEON DYNAMICS</span>
         </NavLink>
         <div className="nav-links">
-          {links.map(l => (
+          {links.map(l => l.external ? (
+            <a key={l.to} href={l.to}>{l.label}</a>
+          ) : (
             <NavLink
               key={l.to}
               to={l.to}
@@ -114,7 +117,7 @@ export default function Nav() {
             <button
               key={l.to}
               className="nav-drawer-link"
-              onClick={() => go(l.to)}
+              onClick={() => { if (l.external) { setOpen(false); window.location.href = l.to; } else { go(l.to); } }}
             >
               <span className="nav-drawer-link-num">/ {String(i + 1).padStart(2, '0')}</span>
               <span className="nav-drawer-link-label">{l.label}</span>
