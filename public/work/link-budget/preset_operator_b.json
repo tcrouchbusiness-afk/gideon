@@ -1,0 +1,34 @@
+{
+  "name": "Operator B — SSO X-band Downlink",
+  "description": "Synthetic demonstration input. Sun-synchronous ~550 km orbit, X-band downlink, two ground stations.",
+  "tle": {
+    "line1": "1 99001U 24001A   26163.50000000  .00000050  00000-0  50000-4 0  9993",
+    "line2": "2 99001  97.6000  90.0000 0001200  90.0000 270.0125 15.19267850123456"
+  },
+  "band": "X",
+  "freq_ghz": 8.4,
+  "tx_power_dbw": 1.0,
+  "tx_gain_dbi": 6.0,
+  "line_loss_db": 0.5,
+  "rx_gain_dbi": 42.0,
+  "system_noise_temp_k": 150,
+  "data_rate_mbps": 100,
+  "modulation": "QPSK",
+  "fec": "R1/2",
+  "required_ebn0_db": 4.5,
+  "ground_stations": [
+    {
+      "name": "GS-Alpha (Mid-Lat)",
+      "lat": 38.5,
+      "lon": -77.0,
+      "min_el_deg": 5
+    },
+    {
+      "name": "GS-Bravo (High-Lat)",
+      "lat": 64.8,
+      "lon": -147.7,
+      "min_el_deg": 5
+    }
+  ],
+  "window_hours": 24
+}

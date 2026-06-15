@@ -1,0 +1,311 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Gideon Corp. — Selected Work</title>
+<meta name="description" content="The Gideon Corp. — capability demonstrations across intelligence, product, operations, and engineering for defense and dual-use companies.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ===== The Gideon Corp. — Tactical Dark (brand tokens) ===== */
+:root{
+  --bg:#0A0C0F; --surface:#14181F; --surface-2:#1C222C; --line:#2A323D;
+  --text:#E6E8EB; --muted:#8B949E; --accent:#F2A900;
+  --go:#3FB950; --info:#36A3E2; --alert:#E5484D;
+  --font-ui:'Inter',-apple-system,'Segoe UI',Roboto,sans-serif;
+  --font-mono:'IBM Plex Mono','JetBrains Mono',ui-monospace,monospace;
+  --ease:cubic-bezier(.2,.7,.2,1); --dur:280ms; --radius:12px; --hair:1px solid var(--line);
+  --maxw:1240px; --pad:clamp(20px,5vw,72px);
+  --accent-glow:0 0 0 1px rgba(242,169,0,.25), 0 0 34px -10px rgba(242,169,0,.5);
+  /* category accents */
+  --c-intel:#36A3E2; --c-product:#F2A900; --c-eng:#3FB950;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--text);font-family:var(--font-ui);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+a{color:inherit;text-decoration:none}
+::selection{background:rgba(242,169,0,.28);color:#fff}
+
+/* faint grid texture */
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.03;
+  background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);
+  background-size:60px 60px;mask-image:radial-gradient(ellipse 110% 70% at 50% 0%,#000 25%,transparent 85%)}
+
+.wrap{width:100%;max-width:var(--maxw);margin:0 auto;padding:0 var(--pad);position:relative;z-index:1}
+.mono{font-family:var(--font-mono);font-variant-numeric:tabular-nums}
+.eyebrow{font-family:var(--font-mono);font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);display:inline-flex;align-items:center;gap:12px}
+.eyebrow::before{content:'';width:26px;height:1px;background:var(--accent)}
+
+/* ===== top bar ===== */
+.topbar{position:sticky;top:0;z-index:20;display:flex;align-items:center;justify-content:space-between;
+  padding:16px var(--pad);background:linear-gradient(180deg,rgba(10,12,15,.92),rgba(10,12,15,.72));
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border-bottom:var(--hair)}
+.brand{display:flex;align-items:center;gap:12px}
+.brand svg{display:block}
+.wordmark{font-weight:800;letter-spacing:.17em;text-transform:uppercase;font-size:14px}
+.wordmark .light{font-weight:400;color:var(--muted)}
+.topbar .demo{font-family:var(--font-mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);border:1px solid rgba(242,169,0,.4);border-radius:5px;padding:5px 10px}
+
+/* ===== hero ===== */
+.hero{padding:88px var(--pad) 30px}
+.hero h1{font-size:clamp(38px,6vw,76px);line-height:1.02;font-weight:900;letter-spacing:-.03em;margin:22px 0 0;max-width:18ch}
+.hero h1 .accent{color:var(--accent)}
+.hero p{font-size:clamp(16px,1.5vw,20px);line-height:1.55;color:var(--muted);max-width:64ch;margin:24px 0 0}
+.hero p strong{color:var(--text);font-weight:600}
+.hero-stats{display:flex;gap:38px;flex-wrap:wrap;margin-top:36px}
+.hero-stats .s .n{font-family:var(--font-mono);font-weight:600;font-size:28px;color:var(--accent)}
+.hero-stats .s .l{font-size:12.5px;color:var(--muted);margin-top:3px;letter-spacing:.02em}
+
+/* ===== filter bar ===== */
+.filters{display:flex;gap:10px;flex-wrap:wrap;padding:30px var(--pad) 6px}
+.filters button{font-family:var(--font-mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--muted);background:var(--surface);border:var(--hair);border-radius:999px;padding:9px 16px;cursor:pointer;
+  transition:color var(--dur) var(--ease),border-color var(--dur) var(--ease),background var(--dur) var(--ease)}
+.filters button:hover{color:var(--text);border-color:#3a4452}
+.filters button.active{color:var(--bg);background:var(--accent);border-color:var(--accent);font-weight:600}
+
+/* ===== grid ===== */
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;padding:26px var(--pad) 10px}
+@media(max-width:1040px){.grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:680px){.grid{grid-template-columns:1fr}.hero-stats{gap:24px}}
+
+.card{background:var(--surface);border:var(--hair);border-radius:var(--radius);overflow:hidden;display:flex;flex-direction:column;
+  transition:transform var(--dur) var(--ease),border-color var(--dur) var(--ease),box-shadow var(--dur) var(--ease);position:relative}
+.card:hover{transform:translateY(-5px);border-color:#3a4452;box-shadow:0 18px 50px -28px rgba(0,0,0,.8)}
+.card .thumb{position:relative;aspect-ratio:16/10;background:#0d1014;overflow:hidden;border-bottom:var(--hair)}
+.card .thumb img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .5s var(--ease);opacity:.95}
+.card:hover .thumb img{transform:scale(1.045)}
+.card .thumb svg{width:100%;height:100%;display:block}
+.card .chip{position:absolute;top:12px;left:12px;font-family:var(--font-mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;
+  padding:5px 9px;border-radius:5px;background:rgba(10,12,15,.78);backdrop-filter:blur(4px);border:1px solid var(--line)}
+.chip.intel{color:var(--c-intel);border-color:rgba(54,163,226,.4)}
+.chip.product{color:var(--c-product);border-color:rgba(242,169,0,.4)}
+.chip.eng{color:var(--c-eng);border-color:rgba(63,185,80,.4)}
+.card .grade{position:absolute;top:12px;right:12px;font-family:var(--font-mono);font-size:11px;font-weight:600;color:var(--accent);
+  background:rgba(10,12,15,.78);backdrop-filter:blur(4px);border:1px solid rgba(242,169,0,.35);border-radius:5px;padding:4px 8px}
+.card .body{padding:20px 20px 22px;display:flex;flex-direction:column;flex:1}
+.card h3{font-size:18.5px;font-weight:700;letter-spacing:-.01em;margin:0}
+.card .desc{font-size:13.5px;line-height:1.55;color:var(--muted);margin:10px 0 0;flex:1}
+.card .actions{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap}
+.btn{font-family:var(--font-mono);font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;font-weight:600;
+  padding:10px 14px;border-radius:7px;cursor:pointer;display:inline-flex;align-items:center;gap:7px;border:1px solid transparent;
+  transition:transform var(--dur) var(--ease),box-shadow var(--dur) var(--ease),background var(--dur) var(--ease),border-color var(--dur) var(--ease)}
+.btn svg{width:13px;height:13px}
+.btn-primary{background:var(--accent);color:var(--bg)}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:var(--accent-glow)}
+.btn-ghost{background:transparent;color:var(--text);border-color:var(--line)}
+.btn-ghost:hover{border-color:var(--muted);transform:translateY(-2px)}
+
+/* section label between groups (optional rows handled by filter, but we keep a divider headline) */
+.section-head{padding:26px var(--pad) 0}
+.section-head h2{font-size:20px;font-weight:700;letter-spacing:-.01em;margin:8px 0 0}
+
+/* ===== footer ===== */
+.footer{margin-top:40px;border-top:var(--hair);padding:34px var(--pad) 48px;display:flex;flex-wrap:wrap;gap:22px;align-items:center;justify-content:space-between}
+.footer .ftag{font-family:var(--font-mono);font-size:12px;color:var(--muted)}
+.footer .fnote{font-size:12.5px;color:var(--muted);max-width:60ch;line-height:1.55}
+.footer a.contact{color:var(--accent)}
+.footer .fdemo{font-family:var(--font-mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);border:var(--hair);border-radius:5px;padding:6px 11px}
+
+.hidden{display:none !important}
+@media (prefers-reduced-motion: reduce){*{transition:none !important}}
+</style>
+</head>
+<body>
+
+<!-- ===== TOP BAR ===== -->
+<header class="topbar">
+  <a class="brand" href="#top" aria-label="The Gideon Corp.">
+    <svg width="22" height="22" viewBox="0 0 32 32" fill="none">
+      <path d="M16 2 L29 9 V23 L16 30 L3 23 V9 Z" stroke="var(--accent)" stroke-width="1.4" opacity=".55"/>
+      <path d="M22 12 H15 a5 5 0 1 0 5 5 v-3" stroke="var(--accent)" stroke-width="2.2" stroke-linecap="square"/>
+    </svg>
+    <span class="wordmark">THE GIDEON <span class="light">CORP.</span></span>
+  </a>
+  <span class="demo">Capability Demonstrations</span>
+</header>
+
+<!-- ===== HERO ===== -->
+<section class="hero" id="top">
+  <div class="wrap">
+    <span class="eyebrow">Selected Work</span>
+    <h1>Intelligence, product, and engineering — <span class="accent">built at mission speed.</span></h1>
+    <p>Eight working demonstrations of what The Gideon Corp. builds for defense and dual-use companies — from market intelligence and competitive analysis to a product launch and real engineering tools. <strong>Each is a live, self-contained build</strong> you can open and use. Click any piece below.</p>
+    <div class="hero-stats">
+      <div class="s"><div class="n">8</div><div class="l">Live demonstrations</div></div>
+      <div class="s"><div class="n">3</div><div class="l">Disciplines</div></div>
+      <div class="s"><div class="n mono">100%</div><div class="l">Synthetic or anonymized data</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== FILTERS ===== -->
+<nav class="filters wrap" id="filters" aria-label="Filter work">
+  <button data-filter="all" class="active">All work</button>
+  <button data-filter="intel">Intelligence &amp; Strategy</button>
+  <button data-filter="product">Product &amp; Operations</button>
+  <button data-filter="eng">Engineering Tools</button>
+</nav>
+
+<!-- ===== GRID ===== -->
+<main class="grid wrap" id="grid">
+
+  <!-- 01 HEATMAP -->
+  <article class="card" data-cat="intel">
+    <div class="thumb"><span class="chip intel">Market Intelligence</span>
+      <img src="/work/portfolio_assets/thumb_heatmap.png" alt="Indo-Pacific demand & risk map" loading="lazy">
+    </div>
+    <div class="body">
+      <h3>Demand &amp; Risk Map — Indo-Pacific</h3>
+      <p class="desc">An interactive map scoring defense-capability demand and entry risk across 14 markets. Click any country for budget trajectory, key programs, acquisition routes, and a five-dimension risk read.</p>
+      <div class="actions">
+        <a class="btn btn-primary" href="/work/demand-map" target="_blank" rel="noopener">Open live map
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+        <a class="btn btn-ghost" href="/work/demand-map/study.docx" target="_blank" rel="noopener">Market study</a>
+      </div>
+    </div>
+  </article>
+
+  <!-- 02b WRAITH -->
+  <article class="card" data-cat="product">
+    <div class="thumb"><span class="chip product">Product Launch</span>
+      <img src="/work/portfolio_assets/thumb_wraith.png" alt="GD-1 WRAITH autonomous VTOL system" loading="lazy">
+    </div>
+    <div class="body">
+      <h3>GD-1 “WRAITH” — Product Launch</h3>
+      <p class="desc">A cinematic, scroll-driven launch site for a fictional autonomous VTOL system — hero reveal, scroll-scrubbed exploded view of every subsystem, and an animated spec sheet. The caliber of launch we build for your hardware.</p>
+      <div class="actions">
+        <a class="btn btn-primary" href="/wraith" target="_blank" rel="noopener">Open the launch
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+      </div>
+    </div>
+  </article>
+
+  <!-- 04 DOSSIER -->
+  <article class="card" data-cat="intel">
+    <div class="thumb"><span class="chip intel">Competitive Intelligence</span>
+      <img src="/work/portfolio_assets/thumb_dossier.png" alt="Competitive intelligence dossier — Target Alpha (USV)" loading="lazy">
+    </div>
+    <div class="body">
+      <h3>Competitive Intelligence Dossier</h3>
+      <p class="desc">An intelligence-community-style competitor profile built from real, cited public data on an anonymized maritime-autonomy target — key judgments with calibrated confidence, technology assessment, and vulnerabilities.</p>
+      <div class="actions">
+        <a class="btn btn-primary" href="/work/dossier.pdf" target="_blank" rel="noopener">Open dossier (PDF)
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+      </div>
+    </div>
+  </article>
+
+  <!-- 05 KILL-CHAIN -->
+  <article class="card" data-cat="intel">
+    <div class="thumb"><span class="chip intel">Capability Analysis</span>
+      <img src="/work/portfolio_assets/thumb_kill-chain.png" alt="Mission-thread kill-chain capability analyzer" loading="lazy">
+    </div>
+    <div class="body">
+      <h3>Mission-Thread Capability Analyzer</h3>
+      <p class="desc">Pick a mission and watch the kill chain decompose into capability nodes. Toggle GPS-denied, comms-jam, or EW to see gaps cascade downstream — then flip to white-space mode to surface where new entrants can win.</p>
+      <div class="actions">
+        <a class="btn btn-primary" href="/work/kill-chain" target="_blank" rel="noopener">Open analyzer
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+      </div>
+    </div>
+  </article>
+
+  <!-- 03 MRO -->
+  <article class="card" data-cat="product">
+    <div class="thumb"><span class="chip product">Operations Analytics</span>
+      <img src="/work/portfolio_assets/thumb_mro.png" alt="MRO inventory movement analysis" loading="lazy">
+    </div>
+    <div class="body">
+      <h3>MRO Inventory &amp; Parts-Flow Analysis</h3>
+      <p class="desc">Turns 200,000 parts records across six warehouses into one clear picture — what’s moving, what’s dead, where cash is trapped, and where a single supplier could halt a repair line.</p>
+      <div class="actions">
+        <a class="btn btn-primary" href="/work/mro-analysis" target="_blank" rel="noopener">Open dashboard
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+        <a class="btn btn-ghost" href="/work/mro-analysis/report.pdf" target="_blank" rel="noopener">Analysis report</a>
+      </div>
+    </div>
+  </article>
+
+  <!-- T1 WIND TUNNEL -->
+  <article class="card" data-cat="eng">
+    <div class="thumb"><span class="chip eng">Engineering Tool</span><span class="grade">A</span>
+      <img src="/work/portfolio_assets/thumb_wind-tunnel.png" alt="Aero & endurance estimator" loading="lazy">
+    </div>
+    <div class="body">
+      <h3>AI Wind Tunnel — Aero &amp; Endurance Estimator</h3>
+      <p class="desc">Estimate a drone’s lift, drag, hover power, and endurance from its geometry in seconds — a fast, physics-based screening tool for early design-space exploration, with an honest fidelity panel.</p>
+      <div class="actions">
+        <a class="btn btn-primary" href="/work/wind-tunnel" target="_blank" rel="noopener">Open the tool
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+      </div>
+    </div>
+  </article>
+
+  <!-- T3 LINK BUDGET -->
+  <article class="card" data-cat="eng">
+    <div class="thumb"><span class="chip eng">Engineering Tool</span>
+      <img src="/work/portfolio_assets/thumb_link-budget.png" alt="Satellite link-budget & coverage analyzer" loading="lazy">
+    </div>
+    <div class="body">
+      <h3>Satellite Link-Budget &amp; Coverage Analyzer</h3>
+      <p class="desc">Real link-budget and orbital-access math — link margin, coverage footprint, and ground-station pass schedules. The same physics as the heavy reference tools, lighter and owned.</p>
+      <div class="actions">
+        <a class="btn btn-primary" href="/work/link-budget" target="_blank" rel="noopener">Open the tool
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+      </div>
+    </div>
+  </article>
+
+  <!-- T2 ISR -->
+  <article class="card" data-cat="eng">
+    <div class="thumb"><span class="chip eng">Engineering Tool</span>
+      <img src="/work/portfolio_assets/thumb_isr.png" alt="Synthetic ISR labeled imagery samples" loading="lazy">
+    </div>
+    <div class="body">
+      <h3>Synthetic ISR Labeling Pipeline</h3>
+      <p class="desc">Generates auto-labeled synthetic EO/IR imagery (COCO + YOLO) with built-in domain-gap QA — a reproducible labeling-pipeline methodology demonstration for perception-model teams.</p>
+      <div class="actions">
+        <a class="btn btn-primary" href="/work/isr" target="_blank" rel="noopener">Open gallery
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+      </div>
+    </div>
+  </article>
+
+</main>
+
+<!-- ===== FOOTER ===== -->
+<footer class="footer">
+  <div class="brand">
+    <svg width="20" height="20" viewBox="0 0 32 32" fill="none">
+      <path d="M16 2 L29 9 V23 L16 30 L3 23 V9 Z" stroke="var(--accent)" stroke-width="1.4" opacity=".5"/>
+      <path d="M22 12 H15 a5 5 0 1 0 5 5 v-3" stroke="var(--accent)" stroke-width="2.2" stroke-linecap="square"/>
+    </svg>
+    <span class="ftag">Sovereign operator at mission speed.</span>
+  </div>
+  <p class="fnote">All work shown is a capability demonstration on synthetic or anonymized data, marked <span class="mono">UNCLASSIFIED // FOR DEMONSTRATION</span>. Built for real engagements on your market, your product, your data. &nbsp;Contact: <a class="contact" href="mailto:tcrouchbusiness@gmail.com">tcrouchbusiness@gmail.com</a></p>
+  <span class="fdemo">For demonstration</span>
+</footer>
+
+<script>
+(function(){
+  var grid=document.getElementById('grid');
+  var cards=Array.prototype.slice.call(grid.querySelectorAll('.card'));
+  var btns=Array.prototype.slice.call(document.querySelectorAll('#filters button'));
+  btns.forEach(function(b){
+    b.addEventListener('click',function(){
+      btns.forEach(function(x){x.classList.remove('active')});
+      b.classList.add('active');
+      var f=b.getAttribute('data-filter');
+      cards.forEach(function(c){
+        var show = (f==='all') || c.getAttribute('data-cat')===f;
+        c.classList.toggle('hidden',!show);
+      });
+    });
+  });
+})();
+</script>
+</body>
+</html>
