@@ -1,55 +1,583 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Gideon Dynamics</title>
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500&family=Inter:wght@400;500&display=swap" rel="stylesheet" />
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Gideon Corp. — Consulting · Own your systems. Move at mission speed.</title>
+<meta name="description" content="The Gideon Corp. helps newly funded defense startups become sovereign operators — own your sales, ops, and comms systems and move at the speed the mission now demands. Built by someone who's driven $100M+ in collected defense contracts.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-  *{box-sizing:border-box;margin:0;padding:0}
-  body{
-    min-height:100vh;
-    background:#0b1220;
-    color:#eef1f6;
-    font-family:"Inter",system-ui,sans-serif;
-    display:flex;align-items:center;justify-content:center;
-    text-align:center;padding:28px;
-    -webkit-font-smoothing:antialiased;
-  }
-  .field{position:fixed;inset:0;pointer-events:none;
-    background:
-      radial-gradient(820px 480px at 50% -12%, rgba(120,150,190,.14), transparent 64%),
-      linear-gradient(rgba(255,255,255,.04) 1px, transparent 1px) 0 0/100% 64px,
-      linear-gradient(90deg, rgba(255,255,255,.04) 1px, transparent 1px) 0 0/64px 100%;
-    mask:radial-gradient(closest-side at 50% 42%, #000, transparent);
-    -webkit-mask:radial-gradient(closest-side at 50% 42%, #000, transparent);
-    opacity:.65;
-  }
-  main{position:relative;max-width:560px}
-  .mark{width:40px;height:40px;border:1px solid rgba(199,162,75,.45);border-radius:9px;display:grid;place-items:center;margin:0 auto 28px;background:linear-gradient(180deg,#152034,#0c1322)}
-  .mark:before{content:"";width:15px;height:15px;border:1.5px solid #c7a24b;transform:rotate(45deg);border-radius:2px}
-  .brand{font-size:13px;letter-spacing:.36em;text-transform:uppercase;color:#9fb0c9}
-  .rule{width:46px;height:1px;background:rgba(199,162,75,.5);margin:22px auto 0}
-  h1{font-family:"Fraunces",Georgia,serif;font-weight:400;font-size:clamp(32px,5.6vw,50px);line-height:1.12;letter-spacing:-.015em;margin:24px 0 0}
-  h1 em{font-style:italic;color:#9fb6d4}
-  p{color:#9fb0c9;font-size:17px;line-height:1.65;margin:24px auto 0;max-width:46ch}
-  .tag{display:inline-flex;align-items:center;gap:9px;margin-top:36px;font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:#c7a24b;border:1px solid rgba(199,162,75,.28);padding:8px 16px;border-radius:100px}
-  .dot{width:6px;height:6px;border-radius:50%;background:#c7a24b}
-  footer{position:fixed;bottom:24px;left:0;right:0;text-align:center;font-size:11.5px;letter-spacing:.04em;color:#5d6a82}
+/* ============ The Gideon Corp. — Tactical Dark ============ */
+:root{
+  --bg:#0A0C0F; --surface:#14181F; --surface-2:#1C222C; --line:#2A323D;
+  --text:#E6E8EB; --muted:#8B949E; --accent:#F2A900;
+  --go:#3FB950; --info:#36A3E2; --alert:#E5484D;
+  --font-ui:'Inter',-apple-system,'Segoe UI',Roboto,sans-serif;
+  --font-mono:'IBM Plex Mono','JetBrains Mono',ui-monospace,monospace;
+  --ease:cubic-bezier(.2,.7,.2,1); --dur:300ms; --radius:12px; --hair:1px solid var(--line);
+  --maxw:1200px; --pad:clamp(20px,5vw,84px);
+  --glow:0 0 0 1px rgba(242,169,0,.25),0 0 40px -10px rgba(242,169,0,.55);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--text);font-family:var(--font-ui);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+a{color:inherit;text-decoration:none}
+img{max-width:100%;display:block}
+::selection{background:rgba(242,169,0,.28);color:#fff}
+.wrap{width:100%;max-width:var(--maxw);margin:0 auto;padding:0 var(--pad);position:relative;z-index:2}
+.mono{font-family:var(--font-mono);font-variant-numeric:tabular-nums}
+.eyebrow{font-family:var(--font-mono);font-size:12px;letter-spacing:.22em;text-transform:uppercase;color:var(--muted);display:inline-flex;align-items:center;gap:12px}
+.eyebrow::before{content:'';width:26px;height:1px;background:var(--accent)}
+.eyebrow .idx{color:var(--accent)}
+
+/* reveals */
+.reveal{opacity:0;transform:translateY(26px);transition:opacity .8s var(--ease),transform .8s var(--ease)}
+.reveal.in{opacity:1;transform:none}
+.reveal.d1{transition-delay:.08s}.reveal.d2{transition-delay:.16s}.reveal.d3{transition-delay:.24s}
+
+/* nav */
+.nav{position:fixed;top:0;left:0;right:0;z-index:50;display:flex;align-items:center;justify-content:space-between;
+  padding:16px var(--pad);background:linear-gradient(180deg,rgba(10,12,15,.9),rgba(10,12,15,0));
+  backdrop-filter:blur(9px);-webkit-backdrop-filter:blur(9px);transition:border-color .4s var(--ease),background .4s var(--ease);border-bottom:1px solid transparent}
+.nav.solid{background:rgba(10,12,15,.92);border-bottom:var(--hair)}
+.nav .brand{display:flex;align-items:center;gap:11px}
+.wordmark{font-weight:800;letter-spacing:.17em;text-transform:uppercase;font-size:14px}
+.wordmark .light{font-weight:400;color:var(--muted)}
+.nav-links{display:flex;gap:28px;align-items:center}
+.nav-links a{font-family:var(--font-mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);transition:color var(--dur) var(--ease)}
+.nav-links a:hover{color:var(--text)}
+.nav-cta{font-family:var(--font-mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--bg);background:var(--accent);padding:9px 15px;border-radius:6px;font-weight:600;transition:transform var(--dur) var(--ease),box-shadow var(--dur) var(--ease)}
+.nav-cta:hover{transform:translateY(-1px);box-shadow:var(--glow)}
+@media(max-width:860px){.nav-links{display:none}}
+
+/* buttons */
+.btn{font-family:var(--font-mono);font-size:12.5px;letter-spacing:.06em;text-transform:uppercase;font-weight:600;padding:14px 22px;border-radius:8px;cursor:pointer;display:inline-flex;align-items:center;gap:9px;border:1px solid transparent;transition:transform var(--dur) var(--ease),box-shadow var(--dur) var(--ease),border-color var(--dur) var(--ease),background var(--dur) var(--ease)}
+.btn svg{width:14px;height:14px}
+.btn-primary{background:var(--accent);color:var(--bg)}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:var(--glow)}
+.btn-ghost{background:transparent;color:var(--text);border-color:var(--line)}
+.btn-ghost:hover{border-color:var(--muted);transform:translateY(-2px)}
+
+/* hero */
+.hero{position:relative;min-height:100vh;display:flex;align-items:center;overflow:hidden;padding:120px var(--pad) 80px}
+.hero-bg{position:absolute;inset:0;z-index:0}
+.hero-bg img{position:absolute;right:-4%;top:50%;transform:translateY(-50%);height:88%;width:auto;opacity:.85;
+  -webkit-mask-image:radial-gradient(ellipse 70% 80% at 60% 50%,#000 45%,transparent 80%);
+  mask-image:radial-gradient(ellipse 70% 80% at 60% 50%,#000 45%,transparent 80%);
+  animation:floaty 9s var(--ease) infinite}
+@keyframes floaty{0%,100%{transform:translateY(-50%)}50%{transform:translateY(-53%)}}
+.hero-veil{position:absolute;inset:0;z-index:1;background:
+  radial-gradient(ellipse 60% 70% at 20% 45%,rgba(242,169,0,.10),transparent 60%),
+  linear-gradient(90deg,var(--bg) 34%,rgba(10,12,15,.55) 62%,rgba(10,12,15,.15) 100%),
+  linear-gradient(180deg,rgba(10,12,15,.55),transparent 22%,transparent 72%,var(--bg))}
+.hero-grid{position:absolute;inset:0;z-index:0;opacity:.05;
+  background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);
+  background-size:64px 64px;mask-image:radial-gradient(ellipse 90% 80% at 30% 40%,#000 30%,transparent 85%)}
+.hero h1{font-size:clamp(40px,6.6vw,86px);line-height:1.0;font-weight:900;letter-spacing:-.035em;margin:24px 0 0;max-width:15ch}
+.hero h1 .accent{color:var(--accent)}
+.hero .sub{font-size:clamp(16px,1.5vw,21px);line-height:1.55;color:var(--muted);max-width:54ch;margin:26px 0 0}
+.hero .sub strong{color:var(--text);font-weight:600}
+.hero .cta-row{display:flex;gap:14px;margin-top:36px;flex-wrap:wrap}
+.scroll-cue{position:absolute;left:50%;bottom:26px;transform:translateX(-50%);z-index:3;font-family:var(--font-mono);font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:var(--muted);display:flex;flex-direction:column;align-items:center;gap:8px}
+.scroll-cue .bar{width:1px;height:40px;background:linear-gradient(var(--accent),transparent);overflow:hidden;position:relative}
+.scroll-cue .bar::after{content:'';position:absolute;top:-50%;left:0;width:100%;height:50%;background:var(--accent);animation:sd 2.2s var(--ease) infinite}
+@keyframes sd{0%{top:-50%}60%,100%{top:120%}}
+
+/* section base */
+section{position:relative;padding:104px 0}
+.section-head h2{font-size:clamp(30px,4.2vw,54px);line-height:1.05;font-weight:800;letter-spacing:-.02em;margin:20px 0 0;max-width:20ch}
+.section-head h2 .accent{color:var(--accent)}
+.lede{font-size:clamp(16px,1.4vw,20px);line-height:1.6;color:var(--muted);max-width:60ch;margin:24px 0 0}
+.lede strong{color:var(--text);font-weight:600}
+#moment{background:linear-gradient(180deg,var(--bg),#07090c 60%,var(--bg))}
+
+/* split text+image */
+.split{display:grid;grid-template-columns:1.02fr .98fr;gap:54px;align-items:center;margin-top:8px}
+.split.rev{direction:rtl}.split.rev>*{direction:ltr}
+@media(max-width:920px){.split{grid-template-columns:1fr;gap:30px}.split.rev{direction:ltr}}
+
+/* framed project figure */
+.figure{position:relative;border:var(--hair);border-radius:14px;overflow:hidden;background:#0b0e12;display:block;
+  box-shadow:0 20px 60px -34px rgba(0,0,0,.85);transition:transform var(--dur) var(--ease),border-color var(--dur) var(--ease),box-shadow var(--dur) var(--ease)}
+.figure:hover{transform:translateY(-5px);border-color:#3a4452;box-shadow:0 26px 64px -30px rgba(0,0,0,.9)}
+.figure .frame-img{aspect-ratio:16/10;overflow:hidden;background:#0b0e12;display:flex;align-items:center;justify-content:center}
+.figure .frame-img img{width:100%;height:100%;object-fit:contain;transition:transform .6s var(--ease)}
+.figure:hover .frame-img img{transform:scale(1.03)}
+.figure .cap{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px 16px;border-top:var(--hair);background:rgba(20,24,31,.6)}
+.figure .cap .t{font-size:13.5px;font-weight:600}
+.figure .cap .t span{display:block;font-family:var(--font-mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin-bottom:3px;font-weight:500}
+.figure .cap .go{font-family:var(--font-mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);white-space:nowrap;display:inline-flex;align-items:center;gap:6px}
+.figure:hover .cap .go{color:var(--accent)}
+.figure .chip{position:absolute;top:12px;left:12px;font-family:var(--font-mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);background:rgba(10,12,15,.78);backdrop-filter:blur(4px);border:1px solid rgba(242,169,0,.4);border-radius:5px;padding:5px 9px}
+
+/* pillars */
+.pillars{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:520px){.pillars{grid-template-columns:1fr}}
+.pillar{background:var(--surface);border:var(--hair);border-radius:var(--radius);padding:20px 18px;transition:transform var(--dur) var(--ease),border-color var(--dur) var(--ease),background var(--dur) var(--ease)}
+.pillar:hover{transform:translateY(-4px);border-color:#3a4452;background:var(--surface-2)}
+.pillar .ico{width:30px;height:30px;color:var(--accent);margin-bottom:12px}
+.pillar h3{font-size:15px;font-weight:700;margin:0 0 6px}
+.pillar p{color:var(--muted);font-size:13px;line-height:1.5;margin:0}
+
+/* dashboard svg figure (03) */
+.dash{border:var(--hair);border-radius:14px;background:#0b0e12;padding:18px;box-shadow:0 20px 60px -34px rgba(0,0,0,.85)}
+.dash svg{width:100%;height:auto;display:block}
+.dash .cap{font-family:var(--font-mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-top:12px;text-align:center}
+.dash .cap b{color:var(--accent)}
+
+/* ===== featured project ===== */
+.feature{min-height:100vh;display:flex;align-items:center;overflow:hidden;border-top:var(--hair)}
+.feature .inner{display:grid;grid-template-columns:1fr 1.08fr;gap:54px;align-items:center;width:100%}
+@media(max-width:980px){.feature .inner{grid-template-columns:1fr;gap:34px}}
+.feature .copy .tag{font-family:var(--font-mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--accent)}
+.feature .copy h2{font-size:clamp(30px,3.8vw,52px);line-height:1.04;font-weight:800;letter-spacing:-.02em;margin:14px 0 0}
+.feature .copy .role{font-family:var(--font-mono);font-size:13px;color:var(--muted);margin-top:10px;letter-spacing:.02em}
+.feature .copy p{color:var(--muted);font-size:15.5px;line-height:1.6;margin:20px 0 0;max-width:52ch}
+.feature .copy p strong{color:var(--text);font-weight:600}
+.feature .specs{display:flex;gap:30px;flex-wrap:wrap;margin-top:26px}
+.feature .specs .s .n{font-family:var(--font-mono);font-weight:600;font-size:24px;color:var(--accent)}
+.feature .specs .s .l{font-size:12px;color:var(--muted);margin-top:3px}
+.feature .copy .actions{margin-top:30px;display:flex;gap:12px;flex-wrap:wrap}
+
+/* browser-window preview (WRAITH) */
+.bview{border:var(--hair);border-radius:14px;overflow:hidden;background:#0b0e12;box-shadow:0 28px 70px -32px rgba(0,0,0,.9)}
+.bview .bar{display:flex;align-items:center;gap:10px;padding:11px 14px;background:linear-gradient(180deg,#161b22,#11151b);border-bottom:var(--hair)}
+.bview .dots{display:flex;gap:6px}
+.bview .dots i{width:10px;height:10px;border-radius:50%;background:#2A323D;display:block}
+.bview .url{flex:1;font-family:var(--font-mono);font-size:11px;color:var(--muted);background:#0b0e12;border:var(--hair);border-radius:6px;padding:5px 10px;text-align:center;letter-spacing:.02em}
+.bview .url b{color:var(--accent);font-weight:500}
+.bview .seg{display:flex;gap:5px}
+.bview .seg button{font-family:var(--font-mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);background:transparent;border:var(--hair);border-radius:5px;padding:5px 9px;cursor:pointer;transition:color var(--dur) var(--ease),border-color var(--dur) var(--ease),background var(--dur) var(--ease)}
+.bview .seg button.on{color:var(--bg);background:var(--accent);border-color:var(--accent);font-weight:600}
+.bview .screen{position:relative;display:block;aspect-ratio:1440/900;overflow:hidden}
+.bview .screen img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .5s var(--ease)}
+.bview .screen img.on{opacity:1}
+.bview .screen video.shotvid{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;background:#0b0e12}
+.bview .vtag{font-family:var(--font-mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);white-space:nowrap}
+.bview .screen .play{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;
+  background:radial-gradient(ellipse 60% 60% at 50% 50%,rgba(10,12,15,.2),rgba(10,12,15,.55));opacity:.0;transition:opacity var(--dur) var(--ease)}
+.bview .screen:hover .play{opacity:1}
+.bview .screen .play .circ{width:74px;height:74px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;box-shadow:var(--glow);transform:scale(.92);transition:transform var(--dur) var(--ease)}
+.bview .screen:hover .play .circ{transform:scale(1)}
+.bview .screen .play .circ svg{width:26px;height:26px;color:var(--bg);margin-left:3px}
+.bview .screen .play .lab{font-family:var(--font-mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:#fff;font-weight:600}
+.bview .livedot{position:absolute;top:12px;right:12px;display:flex;align-items:center;gap:7px;font-family:var(--font-mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--text);background:rgba(10,12,15,.7);border:var(--hair);border-radius:999px;padding:5px 10px;z-index:3}
+.bview .livedot::before{content:'';width:7px;height:7px;border-radius:50%;background:var(--go);box-shadow:0 0 8px var(--go);animation:pulse 1.8s var(--ease) infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+
+/* wind tunnel aero stage */
+#windtunnel{background:radial-gradient(ellipse 80% 60% at 70% 50%,#0d1116,var(--bg))}
+.stage-aero{position:relative;aspect-ratio:4/3;border:var(--hair);border-radius:14px;background:#0b0e12;overflow:hidden;box-shadow:0 24px 64px -34px rgba(0,0,0,.85)}
+.stage-aero svg{width:100%;height:100%;display:block}
+.flow{stroke:var(--info);stroke-width:1.4;fill:none;opacity:0;stroke-dasharray:90 320;animation:flow 3.4s linear infinite}
+.flow.warm{stroke:var(--accent)}
+@keyframes flow{0%{stroke-dashoffset:410;opacity:0}10%{opacity:.7}90%{opacity:.7}100%{stroke-dashoffset:0;opacity:0}}
+.aero-readout{position:absolute;left:14px;bottom:12px;font-family:var(--font-mono);font-size:11px;color:var(--muted);letter-spacing:.04em}
+.aero-readout b{color:var(--accent);font-weight:600}
+.aero-badge{position:absolute;top:12px;left:14px;font-family:var(--font-mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);border:var(--hair);border-radius:5px;padding:5px 9px;background:rgba(10,12,15,.6)}
+
+/* proof */
+#proof{background:linear-gradient(180deg,var(--bg),#07090c 50%,var(--bg))}
+.counters{display:grid;grid-template-columns:repeat(4,1fr);gap:0;margin-top:48px}
+@media(max-width:880px){.counters{grid-template-columns:repeat(2,1fr);gap:30px 0}}
+.counter{padding:6px 26px;border-left:var(--hair)}
+.counter:first-child{border-left:0;padding-left:0}
+.counter .num{font-family:var(--font-mono);font-weight:600;font-size:clamp(34px,4.4vw,56px);letter-spacing:-.03em;line-height:1}
+.counter .num .a{color:var(--accent)}
+.counter .cap{margin-top:14px;font-size:13px;line-height:1.5;color:var(--muted);max-width:26ch}
+.proof-note{margin-top:34px;font-family:var(--font-mono);font-size:11.5px;color:var(--muted);display:flex;align-items:center;gap:10px}
+.proof-note .dot{width:6px;height:6px;border-radius:50%;background:var(--accent)}
+
+/* why */
+.why{display:grid;grid-template-columns:1fr 1fr;gap:40px;margin-top:30px}
+@media(max-width:880px){.why{grid-template-columns:1fr}}
+.why p{color:var(--muted);font-size:15.5px;line-height:1.65}
+.why p strong{color:var(--text);font-weight:600}
+
+/* more work */
+.morework{border-top:var(--hair);border-bottom:var(--hair);background:var(--surface)}
+.morework .wrap{display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap;padding-top:30px;padding-bottom:30px}
+.morework .t{font-size:18px;font-weight:600}
+.morework .t span{color:var(--muted);font-weight:400;font-size:14.5px;display:block;margin-top:4px}
+
+/* CTA */
+#contact{text-align:center}
+#contact h2{font-size:clamp(32px,5vw,68px);font-weight:900;letter-spacing:-.03em;line-height:1.0;margin:18px auto 0;max-width:18ch}
+#contact h2 .accent{color:var(--accent)}
+#contact .lede{margin-left:auto;margin-right:auto}
+#contact .cta-row{display:flex;gap:14px;justify-content:center;margin-top:34px;flex-wrap:wrap}
+
+/* footer */
+.footer{border-top:var(--hair);padding:36px var(--pad) 44px;display:flex;align-items:center;justify-content:space-between;gap:22px;flex-wrap:wrap}
+.footer .ftag{font-family:var(--font-mono);font-size:12px;color:var(--muted)}
+.footer a.contact{color:var(--accent)}
+.footer .fdemo{font-family:var(--font-mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);border:var(--hair);border-radius:5px;padding:6px 11px}
+
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.reveal{opacity:1;transform:none}}
 </style>
 </head>
 <body>
-<div class="field"></div>
-<main>
-  <div class="mark"></div>
-  <div class="brand">Gideon Dynamics</div>
-  <div class="rule"></div>
-  <h1>Defense&#8209;grade intelligence,<br><em>institutional discipline.</em></h1>
-  <p>Sovereign data and infrastructure for the defense industrial base — owned, controlled, and built to endure.</p>
-  <span class="tag"><span class="dot"></span> Coming soon</span>
-</main>
-<footer>&copy; 2026 Gideon Dynamics &nbsp;·&nbsp; Defense &amp; industrial intelligence</footer>
+
+<!-- NAV -->
+<nav class="nav" id="nav">
+  <a class="brand" href="#top" aria-label="The Gideon Corp.">
+    <svg width="22" height="22" viewBox="0 0 32 32" fill="none">
+      <path d="M16 2 L29 9 V23 L16 30 L3 23 V9 Z" stroke="var(--accent)" stroke-width="1.4" opacity=".55"/>
+      <path d="M22 12 H15 a5 5 0 1 0 5 5 v-3" stroke="var(--accent)" stroke-width="2.2" stroke-linecap="square"/>
+    </svg>
+    <span class="wordmark">THE GIDEON <span class="light">CORP.</span></span>
+  </a>
+  <div class="nav-links">
+    <a href="#moment">The moment</a>
+    <a href="#build">What we build</a>
+    <a href="#wraith">Work</a>
+    <a href="#why">Why us</a>
+  </div>
+  <a class="nav-cta" href="#contact">15-min teardown</a>
+</nav>
+
+<!-- HERO -->
+<header class="hero" id="top">
+  <div class="hero-bg">
+    <div class="hero-grid"></div>
+    <img src="/consulting/assets/wraith_hero.png" alt="" aria-hidden="true">
+  </div>
+  <div class="hero-veil"></div>
+  <div class="wrap">
+    <span class="eyebrow">The Gideon Corp. <span class="idx">// Consulting</span></span>
+    <h1>Own your systems. Move at the speed defense <span class="accent">now demands.</span></h1>
+    <p class="sub">Defense is being rebuilt around <strong>speed and ownership</strong> right now. We help newly funded defense startups become sovereign operators — own your sales, ops, and comms, and field at mission speed — before the window closes. <strong>Built by someone who's driven $100M+ in collected defense contracts.</strong></p>
+    <div class="cta-row">
+      <a class="btn btn-primary" href="#contact">Book a 15-minute teardown
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+      <a class="btn btn-ghost" href="#wraith">See the work</a>
+    </div>
+  </div>
+  <div class="scroll-cue"><span>Scroll</span><span class="bar"></span></div>
+</header>
+
+<!-- 01 — THE MOMENT (text + Demand Map image) -->
+<section id="moment">
+  <div class="wrap">
+    <div class="split">
+      <div>
+        <span class="eyebrow reveal"><span class="idx">01</span> &nbsp;/&nbsp; The moment</span>
+        <h2 class="reveal d1" style="font-size:clamp(28px,3.6vw,46px);line-height:1.06;font-weight:800;letter-spacing:-.02em;margin:18px 0 0">The defense industry is being rebuilt right now. <span class="accent">Fast.</span></h2>
+        <p class="lede reveal d2">A new class of companies — Anduril, Palantir, SpaceX, the neoprimes — is winning by fielding in months what used to take years. The whole sector is reorganizing around speed and ownership. The window to become a company that matters is open now, and it won't stay open. <strong>The startups that move fast and own their foundation will define the next decade. The ones that don't will be footnotes.</strong></p>
+      </div>
+      <a class="figure reveal d2" href="/work/demand-map" target="_blank" rel="noopener">
+        <span class="chip">Live demo</span>
+        <div class="frame-img"><svg viewBox="0 0 480 300" preserveAspectRatio="xMidYMid meet" style="width:100%;height:100%;display:block" xmlns="http://www.w3.org/2000/svg">
+          <defs><filter id="dglow" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="3.4"/></filter></defs>
+          <g stroke="#2A323D" stroke-width="1" opacity=".3"><line x1="0" y1="75" x2="480" y2="75"/><line x1="0" y1="150" x2="480" y2="150"/><line x1="0" y1="225" x2="480" y2="225"/><line x1="120" y1="0" x2="120" y2="300"/><line x1="240" y1="0" x2="240" y2="300"/><line x1="360" y1="0" x2="360" y2="300"/></g>
+          <path d="M28 96 q70 -42 168 -20 q44 10 70 44 q-26 54 -96 64 q-104 12 -150 -34 q-12 -34 8 -54 z" fill="#14181F" stroke="#2A323D"/>
+          <path d="M372 236 q44 -20 84 -4 q10 32 -22 52 q-54 6 -72 -20 q-4 -18 10 -28 z" fill="#14181F" stroke="#2A323D"/>
+          <g stroke="#F2A900" stroke-width="1.1" fill="none" opacity=".5" stroke-dasharray="3 5"><path d="M438 150 Q400 110 372 96"/><path d="M438 150 Q392 158 336 168"/><path d="M438 150 Q420 210 404 262"/></g>
+          <circle cx="438" cy="150" r="3.5" fill="#36A3E2"/>
+          <g font-family="IBM Plex Mono,monospace" font-size="9" fill="#8B949E">
+            <circle cx="372" cy="96"  r="26" fill="#F2A900" opacity=".10" filter="url(#dglow)"/><circle cx="372" cy="96"  r="6" fill="#F2A900"/><text x="384" y="92">JPN 81</text>
+            <circle cx="336" cy="168" r="30" fill="#F2A900" opacity=".14" filter="url(#dglow)"><animate attributeName="r" values="30;36;30" dur="2.8s" repeatCount="indefinite"/></circle><circle cx="336" cy="168" r="7" fill="#F2A900"/><text x="348" y="164" fill="#E6E8EB">TWN 88</text>
+            <circle cx="404" cy="262" r="25" fill="#F2A900" opacity=".10" filter="url(#dglow)"/><circle cx="404" cy="262" r="6" fill="#F2A900"/><text x="416" y="266">AUS 79</text>
+            <circle cx="330" cy="120" r="18" fill="#F2A900" opacity=".08" filter="url(#dglow)"/><circle cx="330" cy="120" r="4.5" fill="#9FB23A"/><text x="300" y="114">KOR 74</text>
+            <circle cx="360" cy="212" r="16" fill="#F2A900" opacity=".07" filter="url(#dglow)"/><circle cx="360" cy="212" r="4" fill="#9FB23A"/>
+            <circle cx="150" cy="170" r="16" fill="#F2A900" opacity=".06" filter="url(#dglow)"/><circle cx="150" cy="170" r="4" fill="#2E7D4F"/><text x="120" y="190">IND 64</text>
+            <circle cx="300" cy="236" r="14" fill="#F2A900" opacity=".06" filter="url(#dglow)"/><circle cx="300" cy="236" r="3.5" fill="#2E7D4F"/>
+          </g>
+          <text x="20" y="28" fill="#8B949E" font-family="IBM Plex Mono,monospace" font-size="10" letter-spacing="2.5">INDO-PACIFIC · CAPABILITY DEMAND</text>
+          <g font-family="IBM Plex Mono,monospace" font-size="8" fill="#8B949E"><text x="356" y="22">LOW</text><rect x="382" y="15" width="72" height="7" rx="2" fill="url(#legrad)"/><text x="458" y="22" text-anchor="end" fill="#F2A900">HIGH</text></g>
+          <defs><linearGradient id="legrad" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#14463B"/><stop offset=".5" stop-color="#9FB23A"/><stop offset="1" stop-color="#F2A900"/></linearGradient></defs>
+        </svg></div>
+        <div class="cap"><div class="t"><span>Market &amp; Risk Intelligence</span>Where defense demand is heading — Indo-Pacific</div>
+          <span class="go">Open <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- 02 — THE PROBLEM (text + Operations analytics image) -->
+<section id="problem">
+  <div class="wrap">
+    <div class="split rev">
+      <div>
+        <span class="eyebrow reveal"><span class="idx">02</span> &nbsp;/&nbsp; The problem</span>
+        <h2 class="reveal d1" style="font-size:clamp(28px,3.6vw,46px);line-height:1.06;font-weight:800;letter-spacing:-.02em;margin:18px 0 0">You just raised. Now the rented stack is going to <span class="accent">slow you down.</span></h2>
+        <p class="lede reveal d2">Most defense startups run on a patchwork of SaaS — a CRM, a dozen subscriptions, tools you don't own with data on servers you don't control. It works on day one. It does not work at scale, when the data matters, and when the customer is the U.S. government. <strong>Scale requires sovereignty</strong> — owning your data and systems so you can see and move on every day's decisions. The companies that win this next phase own their stack.</p>
+      </div>
+      <a class="figure reveal d2" href="/work/mro-analysis" target="_blank" rel="noopener">
+        <span class="chip">Live demo</span>
+        <div class="frame-img"><svg viewBox="0 0 480 300" preserveAspectRatio="xMidYMid meet" style="width:100%;height:100%;display:block" xmlns="http://www.w3.org/2000/svg">
+          <text x="20" y="28" fill="#8B949E" font-family="IBM Plex Mono,monospace" font-size="10" letter-spacing="2.5">INVENTORY · WHAT'S MOVING vs DEAD</text>
+          <!-- axes -->
+          <line x1="56" y1="60" x2="56" y2="256" stroke="#2A323D" stroke-width="1"/>
+          <line x1="56" y1="256" x2="452" y2="256" stroke="#2A323D" stroke-width="1"/>
+          <text x="44" y="150" fill="#8B949E" font-family="IBM Plex Mono,monospace" font-size="8" transform="rotate(-90 44 150)" text-anchor="middle" letter-spacing="1.5">ON-HAND VALUE</text>
+          <text x="254" y="276" fill="#8B949E" font-family="IBM Plex Mono,monospace" font-size="8" text-anchor="middle" letter-spacing="1.5">ANNUAL USAGE</text>
+          <!-- dead-stock zone (high stock, no usage) -->
+          <rect x="56" y="60" width="120" height="90" fill="rgba(229,72,77,.06)"/>
+          <text x="66" y="78" fill="#E5484D" font-family="IBM Plex Mono,monospace" font-size="8.5" letter-spacing="1">DEAD STOCK · CASH TRAPPED</text>
+          <!-- moving cluster (amber, lower-right diagonal) -->
+          <g fill="#F2A900"><circle cx="250" cy="190" r="5"/><circle cx="300" cy="168" r="6"/><circle cx="280" cy="205" r="4"/><circle cx="340" cy="150" r="7"/><circle cx="390" cy="120" r="6"/><circle cx="360" cy="178" r="4.5"/><circle cx="412" cy="138" r="5"/><circle cx="318" cy="196" r="4"/><circle cx="430" cy="104" r="5.5"/></g>
+          <!-- dead/slow cluster (red/grey, upper-left) -->
+          <g><circle cx="84" cy="96" r="6" fill="#E5484D"/><circle cx="110" cy="120" r="5" fill="#E5484D"/><circle cx="92" cy="134" r="4" fill="#8B949E"/><circle cx="140" cy="104" r="4.5" fill="#8B949E"/><circle cx="120" cy="86" r="4" fill="#E5484D"/><circle cx="158" cy="130" r="3.5" fill="#8B949E"/></g>
+          <!-- trend guide -->
+          <line x1="70" y1="244" x2="440" y2="100" stroke="#2A323D" stroke-width="1" stroke-dasharray="3 5"/>
+          <text x="300" y="226" fill="#F2A900" font-family="IBM Plex Mono,monospace" font-size="8.5" letter-spacing="1">HEALTHY MOVERS</text>
+        </svg></div>
+        <div class="cap"><div class="t"><span>Operations Analytics</span>The operating picture you should own — not rent</div>
+          <span class="go">Open <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- 03 — WHAT WE BUILD (pillars + owned operating picture visual) -->
+<section id="build">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow reveal"><span class="idx">03</span> &nbsp;/&nbsp; What we build</span>
+      <h2 class="reveal d1">We increase the speed at which you <span class="accent">own your operations.</span></h2>
+      <p class="lede reveal d2">You decide what matters most. We implement it fast and hand it to you to keep — owned systems you can run without us, across four surfaces of the business.</p>
+    </div>
+    <div class="split" style="margin-top:44px">
+      <div class="pillars reveal d1">
+        <div class="pillar">
+          <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 17l5-5 4 3 7-8"/><path d="M16 4h4v4"/></svg>
+          <h3>Revenue &amp; sales</h3><p>Capture and pipeline that compounds; quoting and RFQs out in hours, not days.</p>
+        </div>
+        <div class="pillar">
+          <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2"/></svg>
+          <h3>Operations</h3><p>Daily workflow modernized so paperwork and approvals move at startup speed.</p>
+        </div>
+        <div class="pillar">
+          <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 5h16v10H7l-3 3z"/><path d="M8 9h8M8 12h5"/></svg>
+          <h3>Communication</h3><p>One place your team sees the heartbeat of the business — no more "what's the status?"</p>
+        </div>
+        <div class="pillar">
+          <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 3v18h18"/><path d="M7 14l3-4 3 2 4-6"/></svg>
+          <h3>Data &amp; visibility</h3><p>Everyone on the same live picture, owned by you, running without us.</p>
+        </div>
+      </div>
+      <div class="dash reveal d2" aria-hidden="true">
+        <svg viewBox="0 0 460 300" xmlns="http://www.w3.org/2000/svg">
+          <!-- KPI tiles -->
+          <g font-family="IBM Plex Mono,monospace">
+            <rect x="8" y="8" width="138" height="74" rx="8" fill="#14181F" stroke="#2A323D"/>
+            <text x="22" y="34" fill="#8B949E" font-size="9" letter-spacing="1.5">PIPELINE</text>
+            <text x="22" y="62" fill="#F2A900" font-size="26" font-weight="600">$24.6M</text>
+            <rect x="160" y="8" width="138" height="74" rx="8" fill="#14181F" stroke="#2A323D"/>
+            <text x="174" y="34" fill="#8B949E" font-size="9" letter-spacing="1.5">QUOTE TIME</text>
+            <text x="174" y="62" fill="#E6E8EB" font-size="26" font-weight="600">3.2 h</text>
+            <rect x="312" y="8" width="140" height="74" rx="8" fill="#14181F" stroke="#2A323D"/>
+            <text x="326" y="34" fill="#8B949E" font-size="9" letter-spacing="1.5">ON-TIME</text>
+            <text x="326" y="62" fill="#3FB950" font-size="26" font-weight="600">98.4%</text>
+          </g>
+          <!-- trend panel -->
+          <rect x="8" y="96" width="290" height="196" rx="8" fill="#14181F" stroke="#2A323D"/>
+          <text x="22" y="120" fill="#8B949E" font-family="IBM Plex Mono,monospace" font-size="9" letter-spacing="1.5">REVENUE · LIVE</text>
+          <polyline points="24,250 70,238 116,244 162,210 208,196 254,150 286,128" fill="none" stroke="#F2A900" stroke-width="2.5"/>
+          <polyline points="24,250 70,238 116,244 162,210 208,196 254,150 286,128 286,278 24,278" fill="rgba(242,169,0,.10)" stroke="none"/>
+          <g stroke="#2A323D" stroke-width="1"><line x1="24" y1="278" x2="286" y2="278"/></g>
+          <!-- bars -->
+          <rect x="312" y="96" width="140" height="196" rx="8" fill="#14181F" stroke="#2A323D"/>
+          <text x="326" y="120" fill="#8B949E" font-family="IBM Plex Mono,monospace" font-size="9" letter-spacing="1.5">BY PROGRAM</text>
+          <g>
+            <rect x="326" y="150" width="112" height="12" rx="3" fill="#36A3E2"/>
+            <rect x="326" y="176" width="92" height="12" rx="3" fill="#3FB950"/>
+            <rect x="326" y="202" width="120" height="12" rx="3" fill="#F2A900"/>
+            <rect x="326" y="228" width="66" height="12" rx="3" fill="#8B949E"/>
+            <rect x="326" y="254" width="84" height="12" rx="3" fill="#36A3E2"/>
+          </g>
+        </svg>
+        <div class="cap">One live operating picture — <b>owned by you</b>, running without us</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURE 1 — WRAITH -->
+<section class="feature" id="wraith">
+  <div class="wrap">
+    <div class="inner">
+      <div class="copy">
+        <span class="tag reveal">Selected work · Product launch</span>
+        <h2 class="reveal d1">This is what a launch looks like when you <span style="color:var(--accent)">own it.</span></h2>
+        <div class="role reveal d1">GD-1 “WRAITH” — Autonomous VTOL ISR system · sample build</div>
+        <p class="reveal d2">The neoprimes don't ship a spec PDF — they field a story. We built this autonomous-system reveal end to end: the 3D, the cinematic exploded view, the live spec sheet, the narrative. <strong>The same caliber of launch we build for your hardware</strong> — owned, on your stack, ready when your next raise or program decision lands. Built on a fictional system; the craft is real.</p>
+        <div class="specs reveal d2">
+          <div class="s"><div class="n">3D</div><div class="l">Cinematic product reveal</div></div>
+          <div class="s"><div class="n mono">7</div><div class="l">Subsystems, exploded live</div></div>
+          <div class="s"><div class="n mono">100%</div><div class="l">Owned &amp; self-contained</div></div>
+        </div>
+        <div class="actions reveal d2">
+          <a class="btn btn-primary" href="/wraith" target="_blank" rel="noopener">Launch the experience
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+        </div>
+      </div>
+
+      <div class="bview reveal d1">
+        <div class="bar">
+          <span class="dots"><i></i><i></i><i></i></span>
+          <span class="url"><b>wraith</b>.thegideoncorp.com</span>
+          <span class="vtag">Auto-preview · loop</span>
+        </div>
+        <a class="screen" id="wraithScreen" href="/wraith" target="_blank" rel="noopener" aria-label="Launch the WRAITH experience">
+          <span class="livedot">Live</span>
+          <video class="shotvid" autoplay muted loop playsinline preload="metadata" poster="/consulting/assets/wraith_teaser_poster.jpg">
+            <source src="/consulting/assets/wraith_teaser.mp4" type="video/mp4">
+          </video>
+          <span class="play">
+            <span class="circ"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></span>
+            <span class="lab">Launch the experience</span>
+          </span>
+        </a>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- FEATURE 2 — WIND TUNNEL -->
+<section class="feature" id="windtunnel">
+  <div class="wrap">
+    <div class="inner">
+      <div class="stage-aero reveal d1" aria-hidden="true">
+        <span class="aero-badge">Aero estimator · live</span>
+        <svg viewBox="0 0 480 360" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">
+          <path d="M120 188 C 200 150, 320 158, 392 184 C 320 196, 210 198, 120 188 Z" fill="rgba(242,169,0,.12)" stroke="var(--accent)" stroke-width="1.6"/>
+          <circle cx="392" cy="184" r="3" fill="var(--accent)"/>
+          <path class="flow" d="M20 110 C 160 92, 320 96, 460 108"/>
+          <path class="flow" style="animation-delay:.5s" d="M20 140 C 160 120, 320 126, 460 138"/>
+          <path class="flow warm" style="animation-delay:1s" d="M20 172 C 150 150, 300 156, 460 168"/>
+          <path class="flow warm" style="animation-delay:1.5s" d="M20 200 C 150 214, 300 210, 460 200"/>
+          <path class="flow" style="animation-delay:2s" d="M20 232 C 160 244, 320 240, 460 230"/>
+          <path class="flow" style="animation-delay:2.5s" d="M20 262 C 160 272, 320 268, 460 258"/>
+        </svg>
+        <div class="aero-readout">L/D <b>14.2</b> &nbsp;·&nbsp; ENDURANCE <b>6.4 h</b> &nbsp;·&nbsp; HOVER P <b>1.9 kW</b></div>
+      </div>
+      <div class="copy">
+        <span class="tag reveal">Selected work · Owned engineering tool</span>
+        <h2 class="reveal d1">Stop waiting on slow, expensive <span style="color:var(--accent)">design cycles.</span></h2>
+        <div class="role reveal d1">AI Wind Tunnel — drone aero &amp; endurance estimator</div>
+        <p class="reveal d2">Full CFD is slow and range time is scarce. We built a <strong>physics-based estimator</strong> that takes a drone's geometry — or its CAD — and returns lift, drag, hover power, and endurance in seconds, so your engineers sweep the design space in an afternoon instead of a quarter. A screening tool, honestly scoped: it tells you the two or three shapes worth real CFD. <strong>The kind of owned tool we build into your shop</strong> so speed stops depending on someone else's queue.</p>
+        <div class="specs reveal d2">
+          <div class="s"><div class="n mono">~1000×</div><div class="l">Faster than full CFD</div></div>
+          <div class="s"><div class="n mono">STL</div><div class="l">Reads your real CAD</div></div>
+          <div class="s"><div class="n mono">20/20</div><div class="l">Validation tests pass</div></div>
+        </div>
+        <div class="actions reveal d2">
+          <a class="btn btn-primary" href="/work/wind-tunnel" target="_blank" rel="noopener">Open the tool
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MORE WORK -->
+<div class="morework">
+  <div class="wrap">
+    <div class="t reveal">Six more capability demonstrations.<span>Market intelligence, competitive dossiers, kill-chain analysis, operations analytics, and more — all live.</span></div>
+    <a class="btn btn-ghost reveal d1" href="/work" target="_blank" rel="noopener">See all work
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+  </div>
+</div>
+
+<!-- PROOF -->
+<section id="proof">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow reveal"><span class="idx">04</span> &nbsp;/&nbsp; The reason to believe</span>
+      <h2 class="reveal d1">We've already built this.</h2>
+    </div>
+    <div class="counters" id="counters">
+      <div class="counter reveal d1"><div class="num"><span class="a">$</span><span data-to="100">0</span><span class="a">M+</span></div><div class="cap">Collected defense contract revenue driven.</div></div>
+      <div class="counter reveal d1"><div class="num"><span class="a">$</span><span data-to="20">0</span><span class="a">M+</span></div><div class="cap">Collected profit produced through those motions.</div></div>
+      <div class="counter reveal d2"><div class="num"><span class="a">$</span><span data-to="5">0</span><span class="a">M+</span></div><div class="cap">Raised into the startups we've operated alongside.</div></div>
+      <div class="counter reveal d2"><div class="num"><span data-to="1">0</span></div><div class="cap">Defense company's operating system, modernized end to end.</div></div>
+    </div>
+    <div class="proof-note reveal d2"><span class="dot"></span> Figures are the firm's own track record — defensible, and stated to earn trust, not as the headline.</div>
+  </div>
+</section>
+
+<!-- WHY US -->
+<section id="why">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow reveal"><span class="idx">05</span> &nbsp;/&nbsp; Why us</span>
+      <h2 class="reveal d1">We've done it — and we move <span class="accent">like you do.</span></h2>
+    </div>
+    <div class="why">
+      <p class="reveal d2">We drove <strong>$100M+ in collected contract revenue</strong> for a defense company, modernized the operating system that made delivering it fast, and built the internal comms system that ran it. We've brought millions more into startups and built the teams behind them.</p>
+      <p class="reveal d2">We're not the old guard from Washington with a fixed playbook. We're close to where you are — in age, in mindset, in pace. We adapt fast, we use the newest tools, and <strong>everything we build, you own.</strong> Take what we give you and run with it, change it, or throw it out. It's yours.</p>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section id="contact">
+  <div class="wrap">
+    <span class="eyebrow reveal" style="justify-content:center"><span class="idx">06</span> &nbsp;/&nbsp; Start</span>
+    <h2 class="reveal d1">The cheapest time to own your stack is <span class="accent">right after you raise.</span></h2>
+    <p class="lede reveal d2">That's now. Let's find your slowest system and fix it — you'll leave a 15-minute teardown knowing exactly where you're slow and where you could be.</p>
+    <div class="cta-row reveal d2">
+      <a class="btn btn-primary" href="mailto:tcrouchbusiness@gmail.com?subject=Gideon%20Corp.%20%E2%80%94%2015-minute%20systems%20teardown">Book a 15-minute teardown
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+      <a class="btn btn-ghost" href="mailto:tcrouchbusiness@gmail.com?subject=Question%20for%20The%20Gideon%20Corp.">Email me a question</a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="brand" style="display:flex;align-items:center;gap:11px">
+    <svg width="20" height="20" viewBox="0 0 32 32" fill="none">
+      <path d="M16 2 L29 9 V23 L16 30 L3 23 V9 Z" stroke="var(--accent)" stroke-width="1.4" opacity=".5"/>
+      <path d="M22 12 H15 a5 5 0 1 0 5 5 v-3" stroke="var(--accent)" stroke-width="2.2" stroke-linecap="square"/>
+    </svg>
+    <span class="ftag">Sovereign operator at mission speed.</span>
+  </div>
+  <span class="ftag" style="opacity:.8">tcrouchbusiness@gmail.com</span>
+  <span class="fdemo">Featured work is demonstration · synthetic or anonymized data</span>
+</footer>
+
+<script>
+(function(){
+  var rm=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var nav=document.getElementById('nav');
+  addEventListener('scroll',function(){ nav.classList.toggle('solid', window.scrollY>40); },{passive:true});
+
+  var els=document.querySelectorAll('.reveal');
+  if('IntersectionObserver' in window && !rm){
+    var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target);}});},{threshold:.14,rootMargin:'0px 0px -8% 0px'});
+    els.forEach(function(e){io.observe(e);});
+  } else { els.forEach(function(e){e.classList.add('in');}); }
+
+  // WRAITH preview Overview/Exploded toggle
+  var seg=document.getElementById('wraithSeg'), screen=document.getElementById('wraithScreen');
+  if(seg && screen){
+    seg.querySelectorAll('button').forEach(function(b){
+      b.addEventListener('click',function(ev){
+        ev.preventDefault();           // don't trigger the link
+        seg.querySelectorAll('button').forEach(function(x){x.classList.remove('on');});
+        b.classList.add('on');
+        var v=b.getAttribute('data-v');
+        screen.querySelectorAll('.shot').forEach(function(img){img.classList.toggle('on', img.classList.contains(v));});
+      });
+    });
+  }
+
+  // counters
+  function ease(t){return 1-Math.pow(1-t,4);}
+  function run(el){var to=parseFloat(el.getAttribute('data-to'));if(rm){el.textContent=to;return;}
+    var dur=1400,s=null;function step(ts){if(s===null)s=ts;var p=Math.min((ts-s)/dur,1);el.textContent=Math.round(to*ease(p));if(p<1)requestAnimationFrame(step);else el.textContent=to;}requestAnimationFrame(step);}
+  var nums=document.querySelectorAll('#counters .num [data-to]');
+  if('IntersectionObserver' in window && !rm){
+    var io2=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){run(e.target);io2.unobserve(e.target);}});},{threshold:.6});
+    nums.forEach(function(n){io2.observe(n);});
+  } else { nums.forEach(run); }
+})();
+</script>
 </body>
 </html>
