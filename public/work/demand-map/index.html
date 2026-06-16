@@ -849,5 +849,92 @@ else if (!reduce) startLoop();      // one shared rAF loop drives flows (+ camer
 else paintFlowsStatic();
 })();
 </script>
+
+<!-- ===== Gideon client explainer (gx) — injected; source: Showpieces/_brand/explainer_module.html ===== -->
+<style id="gx-style">
+.gx-btn{position:fixed;right:18px;bottom:18px;z-index:99990;display:inline-flex;align-items:center;gap:9px;
+  font-family:'IBM Plex Mono','JetBrains Mono',ui-monospace,monospace;font-size:12px;font-weight:600;
+  letter-spacing:.04em;text-transform:uppercase;color:#F2A900;background:rgba(20,24,31,.92);
+  border:1px solid rgba(242,169,0,.5);border-radius:999px;padding:10px 16px;cursor:pointer;
+  -webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);
+  box-shadow:0 6px 24px -8px rgba(0,0,0,.7);transition:transform .2s,background .2s,color .2s;}
+.gx-btn:hover{background:#F2A900;color:#0A0C0F;transform:translateY(-2px);}
+.gx-btn .gx-i{display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;
+  border:1.5px solid currentColor;border-radius:50%;font-size:10px;font-weight:700;font-style:italic;font-family:Georgia,'Times New Roman',serif;}
+@keyframes gx-pulse{0%,100%{box-shadow:0 6px 24px -8px rgba(0,0,0,.7),0 0 0 0 rgba(242,169,0,.55);}
+  50%{box-shadow:0 6px 24px -8px rgba(0,0,0,.7),0 0 0 8px rgba(242,169,0,0);}}
+.gx-btn.gx-pulse{animation:gx-pulse 1.4s ease-out 3;}
+.gx-scrim{position:fixed;inset:0;z-index:99991;display:none;align-items:center;justify-content:center;padding:24px;
+  background:rgba(6,8,10,.74);-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px);}
+.gx-scrim.gx-open{display:flex;}
+.gx-modal{position:relative;width:100%;max-width:640px;max-height:88vh;overflow-y:auto;
+  background:#14181F;border:1px solid #2A323D;border-radius:14px;box-shadow:0 30px 80px -30px rgba(0,0,0,.9);
+  color:#E6E8EB;font-family:'Inter',-apple-system,'Segoe UI',Roboto,sans-serif;
+  padding:30px 32px 28px;animation:gx-in .26s cubic-bezier(.2,.7,.2,1);}
+@keyframes gx-in{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:none;}}
+.gx-modal::-webkit-scrollbar{width:8px;}.gx-modal::-webkit-scrollbar-thumb{background:#2A323D;border-radius:6px;}
+.gx-eyebrow{font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:10.5px;letter-spacing:.18em;
+  text-transform:uppercase;color:#8B949E;display:flex;align-items:center;gap:10px;}
+.gx-eyebrow::before{content:'';width:22px;height:1px;background:#F2A900;}
+.gx-modal h2{font-size:23px;font-weight:800;letter-spacing:-.01em;margin:12px 0 0;color:#fff;}
+.gx-block{margin-top:17px;}
+.gx-block h4{font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:11px;font-weight:600;letter-spacing:.12em;
+  text-transform:uppercase;color:#F2A900;margin:0 0 6px;}
+.gx-block p{margin:0;font-size:14.5px;line-height:1.6;color:#C8CDD4;}
+.gx-block ul{margin:0;padding:0;list-style:none;}
+.gx-block li{position:relative;padding-left:17px;font-size:14px;line-height:1.55;color:#C8CDD4;margin-top:8px;}
+.gx-block li::before{content:'';position:absolute;left:0;top:8px;width:5px;height:5px;border-radius:50%;background:#F2A900;}
+.gx-block b{color:#fff;font-weight:600;}
+.gx-note{margin-top:19px;padding:12px 15px;background:#1C222C;border:1px solid #2A323D;border-left:2px solid #F2A900;
+  border-radius:8px;font-size:13px;line-height:1.55;color:#9AA3AD;}
+.gx-note b{color:#E6E8EB;}
+.gx-close{position:absolute;top:14px;right:14px;width:32px;height:32px;display:flex;align-items:center;justify-content:center;
+  background:transparent;border:1px solid #2A323D;border-radius:8px;color:#8B949E;cursor:pointer;font-size:20px;line-height:1;
+  transition:color .2s,border-color .2s;}
+.gx-close:hover{color:#E6E8EB;border-color:#8B949E;}
+@media (max-width:680px){.gx-modal{padding:24px 20px;}.gx-btn{right:12px;bottom:12px;font-size:11px;padding:9px 13px;}}
+@media (prefers-reduced-motion:reduce){.gx-btn.gx-pulse{animation:none;}.gx-modal{animation:none;}}
+</style>
+<button class="gx-btn" id="gxBtn" data-demo="demand-map" type="button" aria-haspopup="dialog" aria-controls="gxScrim"><span class="gx-i">i</span> How to read this</button>
+<div class="gx-scrim" id="gxScrim" role="dialog" aria-modal="true" aria-labelledby="gxTitle" tabindex="-1">
+  <div class="gx-modal" role="document">
+    <button class="gx-close" id="gxClose" type="button" aria-label="Close">&times;</button>
+    <div class="gx-eyebrow">For demonstration · Client guide</div>
+    <h2 id="gxTitle">How to read this map</h2>
+    <div class="gx-block"><h4>What this is</h4><p>A live map scoring <b>where the demand is</b> for a given defense capability across 14 Indo-Pacific markets, and <b>how hard each market is to enter</b>.</p></div>
+    <div class="gx-block"><h4>What you're looking at</h4><ul>
+      <li><b>Map shading</b> — the brighter/amber a country, the higher its demand for the capability currently selected. Darker = lower demand.</li>
+      <li><b>Capability toggle</b> (top) — switch between Counter-UAS, Maritime Autonomy, ISR/Space, C2 &amp; Secure Comms, and Strike-adjacent. The whole map re-shades instantly.</li>
+      <li><b>Country panel</b> (click any country) — demand score, multi-year budget trajectory, key programs, how you’d actually sell in (FMS / NPOR / Direct Commercial), and a five-dimension risk read.</li>
+    </ul></div>
+    <div class="gx-block"><h4>Try this</h4><p>Click <b>Japan</b>, then switch the capability toggle to <b>Maritime Autonomy</b> and watch the map and the panel change.</p></div>
+    <div class="gx-block"><h4>On your engagement</h4><p>We build this on your capability and your target region, with sourced figures and a written market study behind it.</p></div>
+    <div class="gx-note"><b>Real vs. demonstration —</b> The method and market logic are exactly what we deliver. The scores are synthetic but directionally honest, grounded in the real direction of each country’s spending. Marked UNCLASSIFIED // FOR DEMONSTRATION.</div>
+  </div>
+</div>
+<script id="gx-script">
+(function(){
+  var btn=document.getElementById('gxBtn'),scrim=document.getElementById('gxScrim'),
+      modal=scrim&&scrim.querySelector('.gx-modal'),closeBtn=document.getElementById('gxClose');
+  if(!btn||!scrim)return;
+  var key='gideon_explainer_seen_'+(btn.getAttribute('data-demo')||'x'),lastFocus=null;
+  function open(){lastFocus=document.activeElement;scrim.classList.add('gx-open');btn.classList.remove('gx-pulse');
+    try{localStorage.setItem(key,'1');}catch(e){}(closeBtn||modal).focus();document.addEventListener('keydown',onKey);}
+  function close(){scrim.classList.remove('gx-open');document.removeEventListener('keydown',onKey);
+    if(lastFocus&&lastFocus.focus)lastFocus.focus();}
+  function onKey(e){
+    if(e.key==='Escape'){close();return;}
+    if(e.key==='Tab'){var f=scrim.querySelectorAll('button,[href],input,select,textarea,[tabindex]:not([tabindex="-1"])');
+      if(!f.length)return;var first=f[0],last=f[f.length-1];
+      if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus();}
+      else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();}}}
+  btn.addEventListener('click',open);
+  if(closeBtn)closeBtn.addEventListener('click',close);
+  scrim.addEventListener('click',function(e){if(e.target===scrim)close();});
+  var seen;try{seen=localStorage.getItem(key);}catch(e){seen=null;}
+  if(!seen)btn.classList.add('gx-pulse');
+})();
+</script>
+
 </body>
 </html>
