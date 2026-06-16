@@ -264,9 +264,117 @@ section{position:relative;padding:104px 0}
 }
 
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.reveal{opacity:1;transform:none}}
+
+/* ============ gx-intro — one-time opening overlay (/consulting only) ============ */
+.gx-intro{position:fixed; inset:0; z-index:9999; overflow:hidden;
+  clip-path:inset(0 0 0 0); transition:clip-path .55s cubic-bezier(.76,0,.24,1);
+  font-family:"Inter",-apple-system,"Segoe UI",Roboto,sans-serif;
+  --gx-bg:#0A0C0F; --gx-text:#E6E8EB; --gx-accent:#F2A900; --gx-ink:#0A0C0F; --gx-line:#2A323D;}
+.gx-intro.gx-done{clip-path:inset(0 0 100% 0);}
+.gx-panel{position:absolute; inset:0; display:grid; place-items:center;}
+.gx-field{background:var(--gx-bg); color:var(--gx-text);}
+.gx-accentp{background:var(--gx-accent); color:var(--gx-ink); clip-path:inset(0 0 0 100%);}
+.gx-accentp.gx-wipe{animation:gxWipe .26s cubic-bezier(.7,0,.2,1) forwards;}
+@keyframes gxWipe{to{clip-path:inset(0 0 0 0);}}
+.gx-stack{padding:0 8vw; width:100%;}
+.gx-stack .gx-line{display:block; font-weight:900; line-height:.92; letter-spacing:-.025em;
+  font-size:clamp(40px,11vw,140px); text-transform:uppercase; white-space:nowrap;
+  clip-path:inset(0 0 110% 0); transform:translateY(.12em);}
+.gx-stack .gx-line.gx-in{animation:gxSlamUp .34s cubic-bezier(.16,1.1,.3,1) forwards;}
+.gx-intro .gx-acc{color:var(--gx-accent);}
+@keyframes gxSlamUp{to{clip-path:inset(-.12em 0 -.12em 0); transform:none;}}
+.gx-lockup{position:absolute; inset:0; display:grid; place-items:center; opacity:0;
+  background:var(--gx-bg); color:var(--gx-text);}
+.gx-lockup.gx-in{animation:gxFade .38s cubic-bezier(.2,.8,.2,1) forwards;}
+@keyframes gxFade{from{opacity:0;}to{opacity:1;}}
+.gx-logo{display:block; margin:0 auto 22px; width:auto; height:clamp(64px,11vh,104px);
+  opacity:0; transform:scale(.7) translateY(10px);}
+.gx-lockup.gx-in .gx-logo{animation:gxLogoIn .5s cubic-bezier(.2,.9,.2,1) forwards;}
+@keyframes gxLogoIn{to{opacity:1; transform:none;}}
+.gx-word{font-weight:900; font-size:clamp(22px,4.4vw,52px); letter-spacing:-.01em;
+  text-transform:uppercase; transform:translateY(.18em); clip-path:inset(0 0 100% 0);}
+.gx-lockup.gx-in .gx-word{animation:gxSlamUp .42s cubic-bezier(.16,1.05,.3,1) .14s forwards;}
+.gx-rule{height:3px; width:0; background:var(--gx-accent); margin:18px auto 0;
+  box-shadow:var(--gx-accent) 0 0 18px -2px;}
+.gx-lockup.gx-in .gx-rule{animation:gxRule .5s ease .34s forwards;}
+@keyframes gxRule{to{width:min(340px,52vw);}}
+.gx-skip{position:fixed; bottom:24px; right:26px; z-index:10000;
+  font-family:"IBM Plex Mono",ui-monospace,monospace; font-size:11px; letter-spacing:.24em;
+  text-transform:uppercase; padding:8px 14px; border:1px solid rgba(230,232,235,.4);
+  color:var(--gx-text); background:transparent; cursor:pointer; mix-blend-mode:difference;}
+.gx-skip:hover{opacity:.8;}
+body.gx-lock{overflow:hidden;}
+@media (prefers-reduced-motion: reduce){ .gx-intro *{animation-duration:.001s !important;} }
 </style>
 </head>
 <body>
+
+<!-- gx-intro: one-time opening overlay (plays once per session, then self-removes) -->
+<section class="gx-intro" id="gx-intro" role="presentation" aria-hidden="true">
+  <div class="gx-panel gx-field">
+    <div class="gx-stack" id="gx-a">
+      <span class="gx-line">Own</span>
+      <span class="gx-line">your</span>
+      <span class="gx-line gx-acc">systems.</span>
+    </div>
+  </div>
+  <div class="gx-panel gx-accentp" id="gx-accent">
+    <div class="gx-stack" id="gx-b">
+      <span class="gx-line">Move at</span>
+      <span class="gx-line">mission</span>
+      <span class="gx-line">speed.</span>
+    </div>
+  </div>
+  <div class="gx-lockup" id="gx-lockup">
+    <div>
+      <svg class="gx-logo" xmlns="http://www.w3.org/2000/svg" viewBox="400 520 1200 960" aria-label="The Gideon Corp.">
+        <polygon points="1000,520 1600,1120 1000,1720 400,1120" fill="#F2A900"></polygon>
+        <polygon points="1187.5,707.5 1600,1120 1187.5,1532.5 775,1120" fill="#080f08"></polygon>
+        <polygon points="1187.5,1042 1277.5,1198 1097.5,1198" fill="#F2A900"></polygon>
+        <polyline points="1000,520 1600,1120 1240,1480" fill="none" stroke="#F2A900" stroke-width="9" stroke-linejoin="miter" stroke-linecap="butt"></polyline>
+        <line x1="520" y1="1480" x2="1480" y2="1480" stroke="#F2A900" stroke-width="7.5" stroke-linecap="butt"></line>
+      </svg>
+      <div class="gx-word"><span class="gx-acc">The</span> Gideon Corp.</div>
+      <div class="gx-rule"></div>
+    </div>
+  </div>
+  <button class="gx-skip" id="gx-skip" type="button">Skip &rsaquo;</button>
+</section>
+<script>
+(function(){
+  var KEY = 'gideon_intro_seen';
+  var store = window.sessionStorage;
+  var intro = document.getElementById('gx-intro');
+  if(!intro) return;
+  var skip = document.getElementById('gx-skip');
+  function nuke(){ if(intro&&intro.parentNode) intro.parentNode.removeChild(intro);
+                   if(skip&&skip.parentNode) skip.parentNode.removeChild(skip);
+                   document.body.classList.remove('gx-lock'); }
+  try{ if(store && store.getItem(KEY)){ nuke(); return; } }catch(e){}
+  if(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches){
+    try{ store.setItem(KEY,'1'); }catch(e){} nuke(); return;
+  }
+  try{ store.setItem(KEY,'1'); }catch(e){}
+  var linesA = [].slice.call(document.querySelectorAll('#gx-a .gx-line'));
+  var linesB = [].slice.call(document.querySelectorAll('#gx-b .gx-line'));
+  var accent = document.getElementById('gx-accent');
+  var lockup = document.getElementById('gx-lockup');
+  var T=[]; function t(fn,ms){T.push(setTimeout(fn,ms));} function clr(){T.forEach(clearTimeout);T=[];}
+  document.body.classList.add('gx-lock');
+  linesA.forEach(function(l,i){ t(function(){ l.classList.add('gx-in'); }, 120 + i*120); });
+  t(function(){ accent.style.clipPath=''; accent.classList.add('gx-wipe'); }, 880);
+  linesB.forEach(function(l,i){ t(function(){ l.classList.add('gx-in'); }, 1020 + i*115); });
+  t(function(){ lockup.classList.add('gx-in'); }, 1820);
+  t(finish, 2550);
+  function finish(){
+    clr();
+    intro.classList.add('gx-done');
+    document.body.classList.remove('gx-lock');
+    t(nuke, 650);
+  }
+  if(skip) skip.addEventListener('click', finish);
+})();
+</script>
 
 <!-- NAV -->
 <nav class="nav" id="nav">
