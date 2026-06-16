@@ -39,7 +39,6 @@ const links: { to: string; label: string; external?: boolean }[] = [
   { to: '/programs',    label: 'Programs' },
   { to: '/capabilities', label: 'Capabilities' },
   { to: '/mission',     label: 'Mission' },
-  { to: '/work',        label: 'Work', external: true },
   { to: '/contact',     label: 'Contact' },
 ];
 
