@@ -227,6 +227,42 @@ section{position:relative;padding:104px 0}
 .footer a.flink{font-family:var(--font-mono);font-size:12px;letter-spacing:.04em;color:var(--muted);text-decoration:none;transition:color var(--dur) var(--ease)}
 .footer a.flink:hover{color:var(--accent)}
 
+/* ===================== MOBILE NAV MENU ===================== */
+.nav-burger{display:none;width:44px;height:44px;flex-shrink:0;background:transparent;border:1px solid var(--line);border-radius:9px;cursor:pointer;flex-direction:column;align-items:center;justify-content:center;gap:5px;padding:0}
+.nav-burger span{display:block;width:18px;height:2px;background:var(--text);border-radius:2px;transition:transform var(--dur) var(--ease),opacity var(--dur) var(--ease)}
+.nav-burger.open span:nth-child(1){transform:translateY(7px) rotate(45deg)}
+.nav-burger.open span:nth-child(2){opacity:0}
+.nav-burger.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
+.menu-backdrop{position:fixed;inset:0;z-index:58;background:rgba(6,8,11,.6);opacity:0;visibility:hidden;transition:opacity .3s var(--ease)}
+.menu-backdrop.open{opacity:1;visibility:visible}
+.mobile-menu{position:fixed;top:0;right:0;bottom:0;width:min(84vw,330px);z-index:60;background:var(--surface);border-left:1px solid var(--line);box-shadow:-30px 0 60px -30px rgba(0,0,0,.85);transform:translateX(100%);transition:transform .32s var(--ease);display:flex;flex-direction:column;gap:2px;padding:88px 22px 30px;overflow-y:auto}
+.mobile-menu.open{transform:none}
+.mobile-menu a{font-family:var(--font-mono);font-size:14px;letter-spacing:.1em;text-transform:uppercase;color:var(--text);text-decoration:none;padding:16px 4px;border-bottom:1px solid var(--line)}
+.mobile-menu a:active{color:var(--accent)}
+.mobile-menu .mm-cta{margin-top:20px;background:var(--accent);color:var(--bg);font-weight:700;border:none;border-radius:9px;text-align:center;padding:16px;letter-spacing:.08em}
+@media(max-width:860px){.nav-burger{display:flex}.nav-cta{display:none}}
+
+/* ===================== PHONE LAYOUT ===================== */
+@media(max-width:760px){
+  section{padding:60px 0}
+  .hero{min-height:auto;padding:100px var(--pad) 56px}
+  .hero h1{font-size:clamp(33px,8.6vw,50px);margin-top:18px}
+  .hero .sub{font-size:16px;margin-top:20px}
+  .hero .cta-row{margin-top:26px;gap:12px}
+  .scroll-cue{display:none}
+  .feature{min-height:auto;padding:60px 0}
+  .feature .specs{gap:22px}
+  .cta-row .btn,#contact .cta-row .btn,.feature .copy .actions .btn{width:100%;justify-content:center}
+  .bview .vtag{white-space:normal}
+  .bview .bar{flex-wrap:wrap;gap:8px}
+  .morework .wrap{flex-direction:column;align-items:flex-start;gap:16px}
+  .footer{flex-direction:column;align-items:flex-start;gap:14px}
+}
+@media(max-width:380px){
+  .wordmark{font-size:12px;letter-spacing:.12em}
+  .nav .brand img{height:22px!important}
+}
+
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.reveal{opacity:1;transform:none}}
 </style>
 </head>
@@ -246,7 +282,17 @@ section{position:relative;padding:104px 0}
     <a href="#why">Why us</a>
   </div>
   <a class="nav-cta" href="#contact">15-min teardown</a>
+  <button class="nav-burger" aria-label="Open menu" aria-expanded="false" aria-controls="mobileMenu" onclick="toggleMenu()"><span></span><span></span><span></span></button>
 </nav>
+<div class="menu-backdrop" id="menuBackdrop" onclick="closeMenu()"></div>
+<aside class="mobile-menu" id="mobileMenu" aria-label="Site menu">
+  <a href="#moment" onclick="closeMenu()">The moment</a>
+  <a href="#build" onclick="closeMenu()">What we build</a>
+  <a href="#wraith" onclick="closeMenu()">Work</a>
+  <a href="/work" target="_blank" rel="noopener" onclick="closeMenu()">All work ↗</a>
+  <a href="#why" onclick="closeMenu()">Why us</a>
+  <a class="mm-cta" href="#contact" onclick="closeMenu()">Book a 15-min teardown →</a>
+</aside>
 
 <!-- HERO -->
 <header class="hero" id="top">
@@ -559,6 +605,18 @@ section{position:relative;padding:104px 0}
 </footer>
 
 <script>
+/* mobile menu */
+function toggleMenu(){
+  var m=document.getElementById('mobileMenu'),bd=document.getElementById('menuBackdrop'),b=document.querySelector('.nav-burger');
+  var open=m.classList.toggle('open'); bd.classList.toggle('open',open); b.classList.toggle('open',open);
+  b.setAttribute('aria-expanded',open); document.body.style.overflow=open?'hidden':'';
+}
+function closeMenu(){
+  document.getElementById('mobileMenu').classList.remove('open');
+  document.getElementById('menuBackdrop').classList.remove('open');
+  var b=document.querySelector('.nav-burger'); b.classList.remove('open'); b.setAttribute('aria-expanded','false');
+  document.body.style.overflow='';
+}
 (function(){
   var rm=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   var nav=document.getElementById('nav');

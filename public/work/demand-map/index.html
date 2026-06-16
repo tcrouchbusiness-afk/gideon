@@ -198,8 +198,41 @@ body.capture #zoomctl,body.capture #scalebar,body.capture #methodbox,body.captur
 @media (max-width:1100px){#titleblock h1{font-size:12.5px}.seg button{padding:6px 8px;font-size:10px}}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
+<style>
+.mfallback{display:none}
+@media(max-width:760px){
+  html,body{overflow:auto!important;height:auto!important;position:static!important}
+  body>*:not(.mfallback){display:none!important}
+  .mfallback{display:block;min-height:100vh;background:#0A0C0F;color:#E6E8EB;font-family:'Inter',-apple-system,'Segoe UI',Roboto,sans-serif;-webkit-font-smoothing:antialiased;padding:26px 20px 46px}
+  .mfallback *{box-sizing:border-box}
+  .mf-card{max-width:520px;margin:0 auto}
+  .mf-top{display:flex;align-items:center;gap:10px;margin-bottom:20px}
+  .mf-top img{height:24px;width:auto;display:block}
+  .mf-wm{font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:#8B949E}
+  .mf-chip{display:inline-block;font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:#F2A900;border:1px solid rgba(242,169,0,.4);border-radius:5px;padding:5px 10px;margin-bottom:16px}
+  .mf-shot{width:100%;border:1px solid #2A323D;border-radius:12px;display:block;margin-bottom:22px}
+  .mf-title{font-size:24px;font-weight:800;letter-spacing:-.02em;line-height:1.12;margin:0 0 12px}
+  .mf-desc{color:#8B949E;font-size:15px;line-height:1.6;margin:0 0 18px}
+  .mf-list{list-style:none;padding:0;margin:0 0 20px}
+  .mf-list li{position:relative;padding-left:20px;font-size:14px;line-height:1.5;margin-bottom:10px;color:#E6E8EB}
+  .mf-list li::before{content:'';position:absolute;left:0;top:7px;width:7px;height:7px;border-radius:50%;background:#F2A900}
+  .mf-note{font-size:14px;line-height:1.6;color:#8B949E;background:#14181F;border:1px solid #2A323D;border-radius:10px;padding:15px 18px;margin:0 0 22px}
+  .mf-note strong{color:#E6E8EB}
+  .mf-back{display:inline-block;font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:#F2A900;text-decoration:none;border:1px solid #2A323D;border-radius:8px;padding:13px 18px}
+}
+</style>
 </head>
 <body>
+<div class="mfallback"><div class="mf-card">
+  <div class="mf-top"><img src="/consulting/assets/logo.svg" alt=""><span class="mf-wm">The Gideon Corp.</span></div>
+  <span class="mf-chip">Interactive · Desktop tool</span>
+  <img class="mf-shot" src="/work/portfolio_assets/thumb_heatmap.png" alt="Demand &amp; Risk Map — Indo-Pacific preview">
+  <h1 class="mf-title">Demand &amp; Risk Map — Indo-Pacific</h1>
+  <p class="mf-desc">An interactive map scoring defense-capability demand and entry risk across 14 Indo-Pacific markets — with budget trajectory, key programs, acquisition routes, and a five-dimension risk read for each country.</p>
+  <ul class="mf-list"><li>14 markets scored on demand &amp; entry risk</li><li>Per-country budget, programs &amp; acquisition routes</li><li>Toggle capabilities to re-shade the whole theater</li></ul>
+  <p class="mf-note">Built for a pointer and a wide canvas. <strong>Open it on a desktop</strong> to pan, zoom, and click through the live map.</p>
+  <a class="mf-back" href="/work">← All work</a>
+</div></div>
 <div id="app">
   <div class="demo-banner">Unclassified // For Demonstration — Synthetic Data</div>
 
