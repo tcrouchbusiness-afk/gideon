@@ -362,10 +362,10 @@ body.gx-lock{overflow:hidden;}
   var T=[]; function t(fn,ms){T.push(setTimeout(fn,ms));} function clr(){T.forEach(clearTimeout);T=[];}
   document.body.classList.add('gx-lock');
   linesA.forEach(function(l,i){ t(function(){ l.classList.add('gx-in'); }, 130 + i*150); });
-  t(function(){ accent.style.clipPath=''; accent.classList.add('gx-wipe'); }, 1150);
-  linesB.forEach(function(l,i){ t(function(){ l.classList.add('gx-in'); }, 1320 + i*150); });
-  t(function(){ lockup.classList.add('gx-in'); }, 2300);
-  t(finish, 3050);
+  t(function(){ accent.style.clipPath=''; accent.classList.add('gx-wipe'); }, 1700);
+  linesB.forEach(function(l,i){ t(function(){ l.classList.add('gx-in'); }, 1870 + i*150); });
+  t(function(){ lockup.classList.add('gx-in'); }, 3000);
+  t(finish, 3800);
   function finish(){
     clr();
     intro.classList.add('gx-done');
