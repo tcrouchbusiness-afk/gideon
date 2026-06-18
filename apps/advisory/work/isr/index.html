@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Gideon Corp. — Synthetic ISR Dataset</title>
+<link rel="icon" type="image/svg+xml" href="/assets/logo.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0A0C0F;--surface:#14181F;--surface-2:#1C222C;--line:#2A323D;
+--text:#E6E8EB;--muted:#8B949E;--accent:#F2A900;--go:#3FB950;--alert:#E5484D;
+--info:#36A3E2;--font-ui:'Inter',-apple-system,'Segoe UI',Roboto,sans-serif;
+--font-mono:'IBM Plex Mono','JetBrains Mono',ui-monospace,monospace;--radius:10px;
+--hair:1px solid var(--line);}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--text);font-family:var(--font-ui);-webkit-font-smoothing:antialiased}
+.demo-banner{font-family:var(--font-mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:#0A0C0F;background:var(--accent);text-align:center;padding:5px 8px}
+header{padding:18px 22px;border-bottom:var(--hair);display:flex;align-items:baseline;gap:16px;flex-wrap:wrap}
+.wordmark{font-weight:800;letter-spacing:.16em;text-transform:uppercase;font-size:15px}
+.wordmark .light{font-weight:400;color:var(--muted)}
+.eyebrow{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.mono{font-family:var(--font-mono);font-variant-numeric:tabular-nums}
+.wrap{display:grid;grid-template-columns:260px 1fr;gap:0;align-items:start}
+aside{position:sticky;top:0;align-self:start;padding:18px 16px;border-right:var(--hair);height:100vh;overflow:auto}
+aside h3{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin:18px 0 8px}
+aside h3:first-child{margin-top:0}
+.seg{display:flex;flex-wrap:wrap;gap:6px}
+.chip{font-family:var(--font-mono);font-size:11px;padding:5px 9px;border:var(--hair);border-radius:999px;color:var(--muted);cursor:pointer;background:var(--surface);user-select:none;transition:all .15s}
+.chip:hover{color:var(--text);border-color:var(--muted)}
+.chip.on{background:var(--accent);color:#0A0C0F;border-color:var(--accent);font-weight:600}
+.stat{margin-bottom:9px}
+.stat .lab{display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px}
+.stat .lab .n{font-family:var(--font-mono);color:var(--muted)}
+.bar{height:7px;background:var(--surface-2);border-radius:4px;overflow:hidden}
+.bar>i{display:block;height:100%;background:var(--accent)}
+main{padding:16px 18px}
+.toolbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:10px}
+.count{font-family:var(--font-mono);color:var(--muted);font-size:13px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(248px,1fr));gap:12px}
+.card{background:var(--surface);border:var(--hair);border-radius:var(--radius);overflow:hidden}
+.frame{position:relative;width:100%;aspect-ratio:4/3;background:#000}
+.frame img{width:100%;height:100%;display:block;object-fit:cover}
+.bbox{position:absolute;border:2px solid var(--accent);box-shadow:0 0 0 1px rgba(0,0,0,.4)}
+.bbox>span{position:absolute;top:-14px;left:-2px;font-family:var(--font-mono);font-size:9px;font-weight:600;background:var(--accent);color:#0A0C0F;padding:0 3px;line-height:13px;white-space:nowrap}
+.meta{padding:7px 9px;display:flex;gap:6px;align-items:center;flex-wrap:wrap;font-size:11px}
+.tag{font-family:var(--font-mono);font-size:10px;padding:1px 6px;border-radius:4px;border:var(--hair);color:var(--muted)}
+.tag.eo{color:var(--info);border-color:var(--info)}
+.tag.ir{color:var(--alert);border-color:var(--alert)}
+.fname{font-family:var(--font-mono);color:var(--muted);font-size:10px;margin-left:auto}
+.btn{font-family:var(--font-mono);font-size:11px;padding:6px 11px;border:var(--hair);border-radius:6px;background:var(--surface);color:var(--text);cursor:pointer}
+.btn:hover{border-color:var(--accent);color:var(--accent)}
+footer{padding:16px 22px;border-top:var(--hair);color:var(--muted);font-size:12px}
+
+/*mobreflow*/
+@media(max-width:640px){.wrap{grid-template-columns:1fr}aside{position:static;height:auto;max-height:none;border-right:none;border-bottom:var(--hair)}.grid{grid-template-columns:repeat(2,1fr)}main{padding:14px 14px 30px}}
+</style></head><body>
+<div class="demo-banner">Synthetic demonstration data // auto-labeled // not for operational use</div>
+<header>
+  <span class="wordmark">GIDEON<span class="light">&nbsp;CORP.</span></span>
+  <div><div class="eyebrow">Synthetic ISR Labeling-Pipeline · Methodology Demonstration</div>
+  <div class="mono" id="hdr" style="font-size:13px;color:var(--muted)"></div></div>
+</header>
+<div class="wrap">
+  <aside>
+    <h3>Class</h3><div class="seg" id="f-class"></div>
+    <h3>Modality</h3><div class="seg" id="f-mod"></div>
+    <h3>Terrain</h3><div class="seg" id="f-pal"></div>
+    <h3>Noise</h3><div class="seg" id="f-noise"></div>
+    <h3>Class balance</h3><div id="bars"></div>
+    <h3>Coverage</h3><div id="cov" class="mono" style="font-size:11px;color:var(--muted);line-height:1.7"></div>
+    <h3>&nbsp;</h3><button class="btn" id="reset">Reset filters</button>
+    <button class="btn" id="boxtog" style="margin-top:8px">Toggle boxes</button>
+  </aside>
+  <main>
+    <div class="toolbar"><div class="count" id="count"></div></div>
+    <div class="grid" id="grid"></div>
+  </main>
+</div>
+<footer>The Gideon Corp. — <span class="mono">Sovereign operator at mission speed.</span>
+Methodology demo: boxes are auto-generated ground-truth labels (COCO + YOLO), not a training-ready dataset. IR renders are a stylized approximation with corrected thermal polarity.</footer>
+<script>
+const D = {"classes":["ground-vehicle","light-truck","small-vessel","fixed-wing-uas","rotary-uas"],"pretty":{"ground-vehicle":"Ground Vehicle","light-truck":"Light Truck","small-vessel":"Small Vessel","fixed-wing-uas":"Fixed-Wing UAS","rotary-uas":"Rotary UAS"},"records":[{"f":"/work/isr/images/isr_0000.png","m":"IR","p":"desert","n":"med","boxes":[{"c":0,"x":0.634375,"y":0.7958333333333333,"w":0.10625,"h":0.11041666666666666}]},{"f":"/work/isr/images/isr_0001.png","m":"IR","p":"woodland","n":"high","boxes":[{"c":1,"x":0.4890625,"y":0.6520833333333333,"w":0.0828125,"h":0.10416666666666667}]},{"f":"/work/isr/images/isr_0002.png","m":"EO","p":"urban","n":"high","boxes":[{"c":3,"x":0.31875,"y":0.8416666666666667,"w":0.0515625,"h":0.06875},{"c":4,"x":0.403125,"y":0.7916666666666666,"w":0.15,"h":0.19166666666666668}]},{"f":"/work/isr/images/isr_0003.png","m":"EO","p":"maritime","n":"high","boxes":[{"c":2,"x":0.73125,"y":0.8875,"w":0.0171875,"h":0.04791666666666667}]},{"f":"/work/isr/images/isr_0040.png","m":"IR","p":"desert","n":"med","boxes":[{"c":1,"x":0.809375,"y":0.32916666666666666,"w":0.06875,"h":0.06458333333333334},{"c":4,"x":0.1046875,"y":0,"w":0.2328125,"h":0.22291666666666668},{"c":0,"x":0.728125,"y":0.2625,"w":0.1140625,"h":0.12083333333333333},{"c":1,"x":0.8109375,"y":0.8645833333333334,"w":0.1296875,"h":0.13541666666666666}]},{"f":"/work/isr/images/isr_0041.png","m":"IR","p":"woodland","n":"med","boxes":[{"c":3,"x":0.1984375,"y":0.5395833333333333,"w":0.059375,"h":0.075},{"c":4,"x":0.925,"y":0.33541666666666664,"w":0.065625,"h":0.0875}]},{"f":"/work/isr/images/isr_0042.png","m":"EO","p":"urban","n":"med","boxes":[{"c":0,"x":0.9125,"y":0.9270833333333334,"w":0.0296875,"h":0.0625},{"c":1,"x":0.5484375,"y":0.51875,"w":0.075,"h":0.12291666666666666}]},{"f":"/work/isr/images/isr_0043.png","m":"EO","p":"maritime","n":"med","boxes":[{"c":2,"x":0.2359375,"y":0.15833333333333333,"w":0.05,"h":0.13125},{"c":2,"x":0.7640625,"y":0.7604166666666666,"w":0.109375,"h":0.18333333333333332},{"c":3,"x":0.6953125,"y":0.45,"w":0.1359375,"h":0.18125},{"c":4,"x":0.8546875,"y":0.6666666666666666,"w":0.059375,"h":0.08125}]},{"f":"/work/isr/images/isr_0080.png","m":"IR","p":"desert","n":"med","boxes":[{"c":0,"x":0.1734375,"y":0.7458333333333333,"w":0.04375,"h":0.06458333333333334},{"c":1,"x":0.7734375,"y":0.4125,"w":0.0375,"h":0.08125}]},{"f":"/work/isr/images/isr_0081.png","m":"IR","p":"woodland","n":"med","boxes":[{"c":3,"x":0,"y":0.5291666666666667,"w":0.1453125,"h":0.19166666666666668},{"c":4,"x":0.021875,"y":0,"w":0.134375,"h":0.175},{"c":0,"x":0.465625,"y":0.5979166666666667,"w":0.06875,"h":0.18541666666666667}]},{"f":"/work/isr/images/isr_0082.png","m":"EO","p":"urban","n":"high","boxes":[{"c":1,"x":0.2734375,"y":0.4,"w":0.0515625,"h":0.0625},{"c":3,"x":0.778125,"y":0.37916666666666665,"w":0.034375,"h":0.041666666666666664},{"c":4,"x":0.05,"y":0.775,"w":0.146875,"h":0.19583333333333333},{"c":0,"x":0.7140625,"y":0.16041666666666668,"w":0.13125,"h":0.175}]},{"f":"/work/isr/images/isr_0083.png","m":"EO","p":"maritime","n":"low","boxes":[{"c":2,"x":0.6421875,"y":0.29375,"w":0.13125,"h":0.07291666666666667}]},{"f":"/work/isr/images/isr_0120.png","m":"IR","p":"desert","n":"med","boxes":[{"c":0,"x":0.0390625,"y":0.3104166666666667,"w":0.034375,"h":0.06041666666666667},{"c":1,"x":0.5796875,"y":0.09375,"w":0.1515625,"h":0.16666666666666666}]},{"f":"/work/isr/images/isr_0121.png","m":"IR","p":"woodland","n":"med","boxes":[{"c":3,"x":0.4125,"y":0.6583333333333333,"w":0.0859375,"h":0.125},{"c":4,"x":0.0609375,"y":0,"w":0.1375,"h":0.15},{"c":0,"x":0.0953125,"y":0.21458333333333332,"w":0.0875,"h":0.19375},{"c":1,"x":0.4765625,"y":0.17708333333333334,"w":0.0484375,"h":0.06041666666666667}]},{"f":"/work/isr/images/isr_0122.png","m":"EO","p":"urban","n":"low","boxes":[{"c":3,"x":0.7375,"y":0.014583333333333334,"w":0.0484375,"h":0.058333333333333334}]},{"f":"/work/isr/images/isr_0123.png","m":"EO","p":"maritime","n":"low","boxes":[{"c":2,"x":0.109375,"y":0.8833333333333333,"w":0.0234375,"h":0.1},{"c":2,"x":0.4984375,"y":0.041666666666666664,"w":0.028125,"h":0.06875},{"c":4,"x":0.334375,"y":0.48125,"w":0.2328125,"h":0.3125},{"c":2,"x":0.246875,"y":0.4583333333333333,"w":0.05,"h":0.027083333333333334}]},{"f":"/work/isr/images/isr_0160.png","m":"IR","p":"desert","n":"high","boxes":[{"c":1,"x":0.69375,"y":0.00625,"w":0.1203125,"h":0.15}]},{"f":"/work/isr/images/isr_0161.png","m":"IR","p":"woodland","n":"med","boxes":[{"c":4,"x":0.6828125,"y":0.7020833333333333,"w":0.18125,"h":0.21875},{"c":0,"x":0.725,"y":0.88125,"w":0.165625,"h":0.11875},{"c":1,"x":0.728125,"y":0.004166666666666667,"w":0.1203125,"h":0.15833333333333333}]},{"f":"/work/isr/images/isr_0162.png","m":"EO","p":"urban","n":"high","boxes":[{"c":3,"x":0.4234375,"y":0.5375,"w":0.0828125,"h":0.09791666666666667},{"c":4,"x":0,"y":0.4166666666666667,"w":0.071875,"h":0.09791666666666667},{"c":0,"x":0.6515625,"y":0.16458333333333333,"w":0.03125,"h":0.0625},{"c":1,"x":0.81875,"y":0.6770833333333334,"w":0.065625,"h":0.10833333333333334}]},{"f":"/work/isr/images/isr_0163.png","m":"EO","p":"maritime","n":"high","boxes":[{"c":2,"x":0.0421875,"y":0.22083333333333333,"w":0.0765625,"h":0.10625},{"c":2,"x":0.1734375,"y":0.14166666666666666,"w":0.0265625,"h":0.07083333333333333},{"c":3,"x":0.215625,"y":0.12291666666666666,"w":0.090625,"h":0.11875}]},{"f":"/work/isr/images/isr_0200.png","m":"IR","p":"desert","n":"low","boxes":[{"c":0,"x":0.0203125,"y":0,"w":0.109375,"h":0.21875},{"c":1,"x":0.1671875,"y":0.8875,"w":0.0484375,"h":0.08125}]},{"f":"/work/isr/images/isr_0201.png","m":"IR","p":"woodland","n":"high","boxes":[{"c":3,"x":0.0609375,"y":0.33958333333333335,"w":0.0390625,"h":0.05}]},{"f":"/work/isr/images/isr_0202.png","m":"EO","p":"urban","n":"low","boxes":[{"c":4,"x":0.1953125,"y":0.00625,"w":0.175,"h":0.22916666666666666},{"c":0,"x":0.5328125,"y":0.6708333333333333,"w":0.1109375,"h":0.13125}]},{"f":"/work/isr/images/isr_0203.png","m":"EO","p":"maritime","n":"med","boxes":[{"c":2,"x":0.65625,"y":0.75,"w":0.05625,"h":0.12916666666666668},{"c":2,"x":0.375,"y":0.28958333333333336,"w":0.0390625,"h":0.025}]},{"f":"/work/isr/images/isr_0240.png","m":"IR","p":"desert","n":"high","boxes":[{"c":4,"x":0.4578125,"y":0.6375,"w":0.2515625,"h":0.32708333333333334},{"c":0,"x":0.3734375,"y":0.4354166666666667,"w":0.0421875,"h":0.041666666666666664},{"c":1,"x":0.3859375,"y":0.38125,"w":0.11875,"h":0.22708333333333333},{"c":3,"x":0.7890625,"y":0.47708333333333336,"w":0.03125,"h":0.04791666666666667}]},{"f":"/work/isr/images/isr_0241.png","m":"IR","p":"woodland","n":"med","boxes":[{"c":4,"x":0.196875,"y":0.65625,"w":0.0609375,"h":0.08333333333333333},{"c":0,"x":0.44375,"y":0.19375,"w":0.1296875,"h":0.11875},{"c":1,"x":0.4953125,"y":0.3875,"w":0.090625,"h":0.11458333333333333}]},{"f":"/work/isr/images/isr_0242.png","m":"EO","p":"urban","n":"med","boxes":[{"c":3,"x":0.909375,"y":0.5208333333333334,"w":0.0375,"h":0.04583333333333333}]},{"f":"/work/isr/images/isr_0243.png","m":"EO","p":"maritime","n":"high","boxes":[{"c":2,"x":0.8140625,"y":0.6416666666666667,"w":0.0203125,"h":0.04791666666666667},{"c":2,"x":0.209375,"y":0.60625,"w":0.0234375,"h":0.075},{"c":4,"x":0.5734375,"y":0.8645833333333334,"w":0.1203125,"h":0.13541666666666666},{"c":2,"x":0.3578125,"y":0.8833333333333333,"w":0.0640625,"h":0.09583333333333334}]},{"f":"/work/isr/images/isr_0280.png","m":"IR","p":"desert","n":"high","boxes":[{"c":0,"x":0.5671875,"y":0.4875,"w":0.128125,"h":0.13125},{"c":1,"x":0.03125,"y":0.7333333333333333,"w":0.0625,"h":0.05625},{"c":3,"x":0,"y":0.4395833333333333,"w":0.134375,"h":0.21041666666666667}]},{"f":"/work/isr/images/isr_0281.png","m":"IR","p":"woodland","n":"high","boxes":[{"c":4,"x":0.1875,"y":0,"w":0.2046875,"h":0.2604166666666667},{"c":0,"x":0.815625,"y":0.23333333333333334,"w":0.13125,"h":0.12916666666666668},{"c":1,"x":0.04375,"y":0.40208333333333335,"w":0.059375,"h":0.08333333333333333}]},{"f":"/work/isr/images/isr_0282.png","m":"EO","p":"urban","n":"high","boxes":[{"c":3,"x":0.36875,"y":0.7666666666666667,"w":0.0578125,"h":0.06666666666666667},{"c":4,"x":0.5171875,"y":0.4041666666666667,"w":0.20625,"h":0.275}]},{"f":"/work/isr/images/isr_0283.png","m":"EO","p":"maritime","n":"low","boxes":[{"c":2,"x":0.840625,"y":0.9479166666666666,"w":0.04375,"h":0.0375},{"c":2,"x":0.1359375,"y":0.5145833333333333,"w":0.0421875,"h":0.14583333333333334},{"c":2,"x":0.240625,"y":0.23333333333333334,"w":0.065625,"h":0.075},{"c":3,"x":0.2453125,"y":0.225,"w":0.0703125,"h":0.10208333333333333}]},{"f":"/work/isr/images/isr_0320.png","m":"IR","p":"desert","n":"high","boxes":[{"c":0,"x":0.25,"y":0.4583333333333333,"w":0.078125,"h":0.14583333333333334}]},{"f":"/work/isr/images/isr_0321.png","m":"IR","p":"woodland","n":"med","boxes":[{"c":1,"x":0.453125,"y":0.4125,"w":0.078125,"h":0.07291666666666667},{"c":3,"x":0.171875,"y":0.8541666666666666,"w":0.0296875,"h":0.03958333333333333},{"c":4,"x":0.0625,"y":0.6020833333333333,"w":0.1703125,"h":0.22916666666666666},{"c":0,"x":0.0578125,"y":0.39375,"w":0.04375,"h":0.13125}]},{"f":"/work/isr/images/isr_0322.png","m":"EO","p":"urban","n":"high","boxes":[{"c":1,"x":0.2890625,"y":0.04375,"w":0.0484375,"h":0.075},{"c":3,"x":0.7421875,"y":0.6458333333333334,"w":0.0796875,"h":0.10625},{"c":4,"x":0.1125,"y":0.13333333333333333,"w":0.0546875,"h":0.07083333333333333}]},{"f":"/work/isr/images/isr_0323.png","m":"EO","p":"maritime","n":"low","boxes":[{"c":2,"x":0.7640625,"y":0.16458333333333333,"w":0.04375,"h":0.15208333333333332},{"c":2,"x":0.0765625,"y":0.03125,"w":0.0375,"h":0.125}]},{"f":"/work/isr/images/isr_0360.png","m":"IR","p":"desert","n":"med","boxes":[{"c":1,"x":0.36875,"y":0.4041666666666667,"w":0.0625,"h":0.09583333333333334},{"c":3,"x":0.7140625,"y":0.5291666666666667,"w":0.0640625,"h":0.07916666666666666},{"c":4,"x":0.5734375,"y":0,"w":0.140625,"h":0.13541666666666666},{"c":0,"x":0.6140625,"y":0.035416666666666666,"w":0.1359375,"h":0.09375}]},{"f":"/work/isr/images/isr_0361.png","m":"IR","p":"woodland","n":"med","boxes":[{"c":1,"x":0.2359375,"y":0.18125,"w":0.1046875,"h":0.10416666666666667},{"c":3,"x":0.553125,"y":0.3333333333333333,"w":0.0453125,"h":0.06041666666666667}]},{"f":"/work/isr/images/isr_0362.png","m":"EO","p":"urban","n":"high","boxes":[{"c":4,"x":0.5109375,"y":0.44375,"w":0.2296875,"h":0.29583333333333334}]},{"f":"/work/isr/images/isr_0363.png","m":"EO","p":"maritime","n":"low","boxes":[{"c":2,"x":0.3703125,"y":0.5416666666666666,"w":0.0296875,"h":0.08333333333333333},{"c":2,"x":0.025,"y":0.45416666666666666,"w":0.0875,"h":0.08958333333333333},{"c":2,"x":0.7234375,"y":0.23958333333333334,"w":0.053125,"h":0.07708333333333334},{"c":3,"x":0.4234375,"y":0.9,"w":0.04375,"h":0.05}]}],"counts":[19,20,22,20,20],"n":40,"n_ann":101,"modal":{"IR":20,"EO":20},"pal":{"desert":10,"woodland":10,"urban":10,"maritime":10},"noise":{"med":16,"high":16,"low":8}};
+const CL = D.classes, PRE = D.pretty;
+const ABBR = {0:'GV',1:'LT',2:'SV',3:'FW',4:'RW'};
+let F = {class:null, mod:null, pal:null, noise:null}, showBoxes = true;
+document.getElementById('hdr').textContent =
+  `${D.n} images · ${D.n_ann} boxes · ${CL.length} classes · YOLO + COCO · seed 1337`;
+
+function chips(elId, items, key){
+  const el = document.getElementById(elId);
+  items.forEach(([val,label])=>{
+    const c = document.createElement('span'); c.className='chip'; c.textContent=label;
+    c.onclick=()=>{ F[key] = (F[key]===val? null : val); render(); paintChips(); };
+    c.dataset.val=val; c.dataset.key=key; el.appendChild(c);
+  });
+}
+function paintChips(){
+  document.querySelectorAll('.chip').forEach(c=>{
+    c.classList.toggle('on', F[c.dataset.key]==c.dataset.val ||
+      (F[c.dataset.key]===Number(c.dataset.val) && c.dataset.val!==''));
+  });
+}
+chips('f-class', CL.map((c,i)=>[String(i), PRE[c]]), 'class');
+chips('f-mod', [['EO','EO color'],['IR','IR thermal']], 'mod');
+chips('f-pal', [['desert','Desert'],['woodland','Woodland'],['urban','Urban'],['maritime','Maritime']], 'pal');
+chips('f-noise', [['low','Low'],['med','Med'],['high','High']], 'noise');
+
+// balance bars
+const maxc = Math.max(...D.counts);
+document.getElementById('bars').innerHTML = CL.map((c,i)=>
+ `<div class="stat"><div class="lab"><span>${PRE[c]}</span><span class="n">${D.counts[i]}</span></div>
+  <div class="bar"><i style="width:${D.counts[i]/maxc*100}%"></i></div></div>`).join('');
+document.getElementById('cov').innerHTML =
+ `EO ${D.modal.EO} · IR ${D.modal.IR}<br>`+
+ Object.entries(D.pal).map(([k,v])=>`${k} ${v}`).join(' · ')+`<br>`+
+ `noise: `+Object.entries(D.noise).map(([k,v])=>`${k} ${v}`).join(' · ');
+
+function match(r){
+  if(F.mod && r.m!==F.mod) return false;
+  if(F.pal && r.p!==F.pal) return false;
+  if(F.noise && r.n!==F.noise) return false;
+  if(F.class!==null && !r.boxes.some(b=>b.c===Number(F.class))) return false;
+  return true;
+}
+function render(){
+  const g = document.getElementById('grid'); g.innerHTML='';
+  const out = D.records.filter(match);
+  document.getElementById('count').textContent =
+    `${out.length} of ${D.n} images`+(anyFilter()?' (filtered)':'');
+  const frag = document.createDocumentFragment();
+  out.forEach(r=>{
+    const card=document.createElement('div'); card.className='card';
+    const boxes = r.boxes.map(b=>{
+      const hl = (F.class!==null && b.c===Number(F.class));
+      return `<div class="bbox" style="left:${b.x*100}%;top:${b.y*100}%;width:${b.w*100}%;height:${b.h*100}%;${hl?'border-color:var(--go)':''}">
+        <span style="${hl?'background:var(--go)':''}">${ABBR[b.c]}</span></div>`;
+    }).join('');
+    card.innerHTML=`<div class="frame"><img loading="lazy" src="${r.f}" alt="">
+      <div class="ov" style="position:absolute;inset:0;display:${showBoxes?'block':'none'}">${boxes}</div></div>
+      <div class="meta"><span class="tag ${r.m.toLowerCase()}">${r.m}</span>
+      <span class="tag">${r.p}</span><span class="tag">noise:${r.n}</span>
+      <span class="tag">${r.boxes.length} tgt</span>
+      <span class="fname">${r.f.split('/').pop()}</span></div>`;
+    frag.appendChild(card);
+  });
+  g.appendChild(frag);
+}
+function anyFilter(){return F.class!==null||F.mod||F.pal||F.noise;}
+document.getElementById('reset').onclick=()=>{F={class:null,mod:null,pal:null,noise:null};render();paintChips();};
+document.getElementById('boxtog').onclick=()=>{showBoxes=!showBoxes;
+  document.querySelectorAll('.ov').forEach(o=>o.style.display=showBoxes?'block':'none');};
+render();
+</script>
+<!-- ===== Gideon client explainer (gx) — injected; source: Showpieces/_brand/explainer_module.html ===== -->
+<style id="gx-style">
+.gx-btn{position:fixed;right:18px;bottom:18px;z-index:99990;display:inline-flex;align-items:center;gap:9px;
+  font-family:'IBM Plex Mono','JetBrains Mono',ui-monospace,monospace;font-size:12px;font-weight:600;
+  letter-spacing:.04em;text-transform:uppercase;color:#F2A900;background:rgba(20,24,31,.92);
+  border:1px solid rgba(242,169,0,.5);border-radius:999px;padding:10px 16px;cursor:pointer;
+  -webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);
+  box-shadow:0 6px 24px -8px rgba(0,0,0,.7);transition:transform .2s,background .2s,color .2s;}
+.gx-btn:hover{background:#F2A900;color:#0A0C0F;transform:translateY(-2px);}
+.gx-btn .gx-i{display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;
+  border:1.5px solid currentColor;border-radius:50%;font-size:10px;font-weight:700;font-style:italic;font-family:Georgia,'Times New Roman',serif;}
+@keyframes gx-pulse{0%,100%{box-shadow:0 6px 24px -8px rgba(0,0,0,.7),0 0 0 0 rgba(242,169,0,.55);}
+  50%{box-shadow:0 6px 24px -8px rgba(0,0,0,.7),0 0 0 8px rgba(242,169,0,0);}}
+.gx-btn.gx-pulse{animation:gx-pulse 1.4s ease-out 3;}
+.gx-scrim{position:fixed;inset:0;z-index:99991;display:none;align-items:center;justify-content:center;padding:24px;
+  background:rgba(6,8,10,.74);-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px);}
+.gx-scrim.gx-open{display:flex;}
+.gx-modal{position:relative;width:100%;max-width:640px;max-height:88vh;overflow-y:auto;
+  background:#14181F;border:1px solid #2A323D;border-radius:14px;box-shadow:0 30px 80px -30px rgba(0,0,0,.9);
+  color:#E6E8EB;font-family:'Inter',-apple-system,'Segoe UI',Roboto,sans-serif;
+  padding:30px 32px 28px;animation:gx-in .26s cubic-bezier(.2,.7,.2,1);}
+@keyframes gx-in{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:none;}}
+.gx-modal::-webkit-scrollbar{width:8px;}.gx-modal::-webkit-scrollbar-thumb{background:#2A323D;border-radius:6px;}
+.gx-eyebrow{font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:10.5px;letter-spacing:.18em;
+  text-transform:uppercase;color:#8B949E;display:flex;align-items:center;gap:10px;}
+.gx-eyebrow::before{content:'';width:22px;height:1px;background:#F2A900;}
+.gx-modal h2{font-size:23px;font-weight:800;letter-spacing:-.01em;margin:12px 0 0;color:#fff;}
+.gx-block{margin-top:17px;}
+.gx-block h4{font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:11px;font-weight:600;letter-spacing:.12em;
+  text-transform:uppercase;color:#F2A900;margin:0 0 6px;}
+.gx-block p{margin:0;font-size:14.5px;line-height:1.6;color:#C8CDD4;}
+.gx-block ul{margin:0;padding:0;list-style:none;}
+.gx-block li{position:relative;padding-left:17px;font-size:14px;line-height:1.55;color:#C8CDD4;margin-top:8px;}
+.gx-block li::before{content:'';position:absolute;left:0;top:8px;width:5px;height:5px;border-radius:50%;background:#F2A900;}
+.gx-block b{color:#fff;font-weight:600;}
+.gx-note{margin-top:19px;padding:12px 15px;background:#1C222C;border:1px solid #2A323D;border-left:2px solid #F2A900;
+  border-radius:8px;font-size:13px;line-height:1.55;color:#9AA3AD;}
+.gx-note b{color:#E6E8EB;}
+.gx-close{position:absolute;top:14px;right:14px;width:32px;height:32px;display:flex;align-items:center;justify-content:center;
+  background:transparent;border:1px solid #2A323D;border-radius:8px;color:#8B949E;cursor:pointer;font-size:20px;line-height:1;
+  transition:color .2s,border-color .2s;}
+.gx-close:hover{color:#E6E8EB;border-color:#8B949E;}
+@media (max-width:680px){.gx-modal{padding:24px 20px;}.gx-btn{right:12px;bottom:12px;font-size:11px;padding:9px 13px;}}
+@media (prefers-reduced-motion:reduce){.gx-btn.gx-pulse{animation:none;}.gx-modal{animation:none;}}
+</style>
+<button class="gx-btn" id="gxBtn" data-demo="isr" type="button" aria-haspopup="dialog" aria-controls="gxScrim"><span class="gx-i">i</span> How to read this</button>
+<div class="gx-scrim" id="gxScrim" role="dialog" aria-modal="true" aria-labelledby="gxTitle" tabindex="-1">
+  <div class="gx-modal" role="document">
+    <button class="gx-close" id="gxClose" type="button" aria-label="Close">&times;</button>
+    <div class="gx-eyebrow">For demonstration · Client guide</div>
+    <h2 id="gxTitle">What you’re looking at</h2>
+    <div class="gx-block"><h4>What this is</h4><p>A pipeline that <b>generates</b> synthetic EO/IR imagery already labeled with perfect bounding boxes — so a perception team can bootstrap a detector without scarce, expensive real data.</p></div>
+    <div class="gx-block"><h4>What you're looking at</h4><ul>
+      <li><b>The grid</b> — synthetic images across five target classes (ground vehicle, light truck, small vessel, fixed-wing UAS, rotary UAS). Every <b>box was generated automatically</b> — because we placed the target, we know exactly where it is. No human labeling.</li>
+      <li><b>EO vs. IR</b> — color (electro-optical) and a simulated thermal (IR) rendering, with hot-spots where engines/exhaust would be.</li>
+      <li><b>Filters &amp; stats</b> — slice by class, modality, terrain, or noise; the bars show class balance.</li>
+    </ul></div>
+    <div class="gx-block"><h4>Try this</h4><p>Filter to <b>IR</b> and notice the boxes still sit exactly on the targets.</p></div>
+    <div class="gx-block"><h4>On your engagement</h4><p>We build the pipeline around your target classes and sensors, exported in your training format (YOLO / COCO).</p></div>
+    <div class="gx-note"><b>Real vs. demonstration —</b> This is a methodology demonstration, not training-ready imagery. We measure and state the sim-to-real “domain gap” honestly (currently MEDIUM) and recommend validating on ≥15–20% real data.</div>
+  </div>
+</div>
+<script id="gx-script">
+(function(){
+  var btn=document.getElementById('gxBtn'),scrim=document.getElementById('gxScrim'),
+      modal=scrim&&scrim.querySelector('.gx-modal'),closeBtn=document.getElementById('gxClose');
+  if(!btn||!scrim)return;
+  var key='gideon_explainer_seen_'+(btn.getAttribute('data-demo')||'x'),lastFocus=null;
+  function open(){lastFocus=document.activeElement;scrim.classList.add('gx-open');btn.classList.remove('gx-pulse');
+    try{localStorage.setItem(key,'1');}catch(e){}(closeBtn||modal).focus();document.addEventListener('keydown',onKey);}
+  function close(){scrim.classList.remove('gx-open');document.removeEventListener('keydown',onKey);
+    if(lastFocus&&lastFocus.focus)lastFocus.focus();}
+  function onKey(e){
+    if(e.key==='Escape'){close();return;}
+    if(e.key==='Tab'){var f=scrim.querySelectorAll('button,[href],input,select,textarea,[tabindex]:not([tabindex="-1"])');
+      if(!f.length)return;var first=f[0],last=f[f.length-1];
+      if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus();}
+      else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();}}}
+  btn.addEventListener('click',open);
+  if(closeBtn)closeBtn.addEventListener('click',close);
+  scrim.addEventListener('click',function(e){if(e.target===scrim)close();});
+  var seen;try{seen=localStorage.getItem(key);}catch(e){seen=null;}
+  if(!seen)btn.classList.add('gx-pulse');
+})();
+</script>
+
+</body></html>

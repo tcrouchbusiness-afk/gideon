@@ -1,0 +1,8 @@
+{
+  "cleanUrls": true,
+  "trailingSlash": false,
+  "redirects": [
+    { "source": "/consulting", "destination": "/", "permanent": false },
+    { "source": "/consulting/:path*", "destination": "/:path*", "permanent": false }
+  ]
+}
