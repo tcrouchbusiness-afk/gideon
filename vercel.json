@@ -1,0 +1,14 @@
+{
+  "buildCommand": "cd apps/main && npm ci && npm run build",
+  "outputDirectory": "apps/main/dist",
+  "cleanUrls": true,
+  "trailingSlash": false,
+  "redirects": [
+    { "source": "/consulting/:path*", "destination": "https://advisory.thegideoncorp.com/", "permanent": false },
+    { "source": "/work/:path*", "destination": "https://advisory.thegideoncorp.com/work/:path*", "permanent": false },
+    { "source": "/wraith/:path*", "destination": "https://advisory.thegideoncorp.com/wraith/:path*", "permanent": false }
+  ],
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/index.html" }
+  ]
+}
