@@ -1,7 +1,6 @@
 {
   "buildCommand": "cd apps/main && npm ci && npm run build",
   "outputDirectory": "apps/main/dist",
-  "cleanUrls": true,
   "trailingSlash": false,
   "redirects": [
     { "source": "/consulting/:path*", "destination": "https://advisory.thegideoncorp.com/", "permanent": false },
