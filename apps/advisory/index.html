@@ -13,7 +13,7 @@
 /* ============ The Gideon Corp. — Tactical Dark ============ */
 :root{
   --bg:#0A0C0F; --surface:#14181F; --surface-2:#1C222C; --line:#2A323D;
-  --text:#E6E8EB; --muted:#8B949E; --accent:#F2A900;
+  --text:#E6E8EB; --muted:#C9D1D9; --accent:#F2A900;
   --go:#3FB950; --info:#36A3E2; --alert:#E5484D;
   --font-ui:'Inter',-apple-system,'Segoe UI',Roboto,sans-serif;
   --font-mono:'IBM Plex Mono','JetBrains Mono',ui-monospace,monospace;
@@ -81,6 +81,8 @@ img{max-width:100%;display:block}
 .hero .sub{font-size:clamp(16px,1.5vw,21px);line-height:1.55;color:var(--muted);max-width:54ch;margin:26px 0 0}
 .hero .sub strong{color:var(--text);font-weight:600}
 .hero .cta-row{display:flex;gap:14px;margin-top:36px;flex-wrap:wrap}
+.hero .wrap::before{content:'';position:absolute;inset:-40px -10% -40px -50vw;z-index:-1;pointer-events:none;
+  background:linear-gradient(90deg,rgba(0,0,0,.6) 0%,rgba(0,0,0,.6) 18%,rgba(0,0,0,0) 70%)}
 .scroll-cue{position:absolute;left:50%;bottom:26px;transform:translateX(-50%);z-index:3;font-family:var(--font-mono);font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:var(--muted);display:flex;flex-direction:column;align-items:center;gap:8px}
 .scroll-cue .bar{width:1px;height:40px;background:linear-gradient(var(--accent),transparent);overflow:hidden;position:relative}
 .scroll-cue .bar::after{content:'';position:absolute;top:-50%;left:0;width:100%;height:50%;background:var(--accent);animation:sd 2.2s var(--ease) infinite}
@@ -412,7 +414,7 @@ body.gx-lock{overflow:hidden;}
   <div class="wrap">
     <span class="eyebrow">The Gideon Corp. <span class="idx">// Consulting</span></span>
     <h1>Own your systems. Move at the speed defense <span class="accent">now demands.</span></h1>
-    <p class="sub">Defense companies rarely lose because their technology is wrong — they lose because the competition outruns them. We help newly funded defense startups become 2030 defense companies — own your sales, ops, and comms, and field at the high-tempo mission speed the market now requires — before the window closes. <strong>Built by someone who's driven $100M+ in collected defense contracts.</strong></p>
+    <p class="sub">Defense companies rarely lose on technology — they lose because they don't move fast enough. <strong>We help newly funded defense startups become the defense primes of the 2030s</strong>: operating systems for business development, ops, and comms, built so <strong>the manual work runs itself</strong>, allowing your team to field at the high-tempo mission speed the market now demands. Before your competition outpaces you. Built by an operator who's driven $100M+ in defense contract revenue.</p>
     <div class="cta-row">
       <a class="btn btn-primary" href="#contact">Book a 15-minute teardown
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
@@ -467,7 +469,7 @@ body.gx-lock{overflow:hidden;}
       <div>
         <span class="eyebrow reveal"><span class="idx">02</span> &nbsp;/&nbsp; The problem</span>
         <h2 class="reveal d1" style="font-size:clamp(28px,3.6vw,46px);line-height:1.06;font-weight:800;letter-spacing:-.02em;margin:18px 0 0">You just raised. Now the rented stack is going to <span class="accent">slow you down.</span></h2>
-        <p class="lede reveal d2">Most defense startups run on a patchwork of SaaS — a CRM, a dozen subscriptions, tools you don't own with data on servers you don't control. It works on day one. It does not work at scale, when the data matters, and when the customer is the U.S. government. <strong>Scale requires sovereignty and speed</strong> — owning your data and systems so you can act on them the same day, because deals now get won or lost in hours, not weeks. That's what a 2030 defense company is built for, and it's what wins this next phase.</p>
+        <p class="lede reveal d2">Most defense startups run on a patchwork of SaaS — a CRM, a dozen subscriptions, <strong>tools you rent but never own</strong>. It works on day one. It breaks at scale. When you don't own your systems, every change is a support ticket and every fix runs on someone else's roadmap. So while <strong>deals now move in hours</strong>, you're <strong>waiting weeks on a vendor</strong> to ship a change you should have owned outright. That's the gap that decides who becomes a defense prime of the 2030s — and who gets outrun.</p>
       </div>
       <a class="figure reveal d2" href="/work/mro-analysis" target="_blank" rel="noopener">
         <span class="chip">Live demo</span>
@@ -502,7 +504,7 @@ body.gx-lock{overflow:hidden;}
     <div class="section-head">
       <span class="eyebrow reveal"><span class="idx">03</span> &nbsp;/&nbsp; What we build</span>
       <h2 class="reveal d1">We increase the speed at which you <span class="accent">own your operations.</span></h2>
-      <p class="lede reveal d2">You decide what matters most. We implement it fast and hand it to you to keep — owned systems you can run without us, across four surfaces of the business.</p>
+      <p class="lede reveal d2">Your business operating system — the sales, operations, communication, and data layers that run the company. You decide what matters most; we implement it fast and hand it to you to keep — owned systems you can run without us.</p>
     </div>
     <div class="split" style="margin-top:44px">
       <div class="pillars reveal d1">
